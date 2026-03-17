@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { getAnimalForLetter } from '../data/animals';
+import { colors, fonts, radius } from '../styles/theme';
 
 const KEYBOARD_ROWS = [
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -40,24 +41,24 @@ export default function Keyboard({ collectedAnimals, onKeyClick }: Props) {
       bottom: 0,
       left: 0,
       right: 0,
-      padding: '8px 8px 12px',
-      background: 'linear-gradient(0deg, #ffffffee, #ffffffcc)',
+      padding: '6px 4px max(10px, env(safe-area-inset-bottom))',
+      background: `linear-gradient(0deg, ${colors.cream}ee, ${colors.cream}cc)`,
       backdropFilter: 'blur(10px)',
       zIndex: 20,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      gap: '5px',
+      gap: '4px',
+      borderTop: `2px solid ${colors.lavender}30`,
     }}>
       {KEYBOARD_ROWS.map((row, rowIdx) => (
         <div
           key={rowIdx}
           style={{
             display: 'flex',
-            gap: '4px',
+            gap: '3px',
             justifyContent: 'center',
-            // Offset middle rows like a real keyboard
-            marginLeft: rowIdx === 1 ? '20px' : rowIdx === 2 ? '44px' : '0',
+            marginLeft: rowIdx === 1 ? '16px' : rowIdx === 2 ? '36px' : '0',
           }}
         >
           {row.map(letter => {
@@ -78,7 +79,6 @@ export default function Keyboard({ collectedAnimals, onKeyClick }: Props) {
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.1 }}
                 onClick={() => {
-                  // Simulate a keypress
                   if (onKeyClick) onKeyClick(letter);
                   const event = new KeyboardEvent('keydown', {
                     key: letter.toLowerCase(),
@@ -90,50 +90,50 @@ export default function Keyboard({ collectedAnimals, onKeyClick }: Props) {
                   setTimeout(() => setPressedKey(null), 150);
                 }}
                 style={{
-                  width: '38px',
-                  height: '44px',
-                  borderRadius: '8px',
+                  width: 'min(9vw, 38px)',
+                  height: 'min(11vw, 44px)',
+                  borderRadius: radius.sm,
                   border: isPressed
-                    ? `2px solid ${animal?.color || '#CE93D8'}`
+                    ? `2px solid ${animal?.color || colors.lavender}`
                     : isCollected
-                      ? `2px solid ${animal?.color || '#81C784'}50`
-                      : '2px solid #E0E0E0',
+                      ? `2px solid ${animal?.color || colors.mint}50`
+                      : `2px solid ${colors.lavender}30`,
                   background: isPressed
-                    ? `linear-gradient(135deg, ${animal?.color || '#CE93D8'}, ${animal?.bgColor || '#F3E5F5'})`
+                    ? `linear-gradient(135deg, ${animal?.color || colors.lavender}, ${animal?.bgColor || colors.blush})`
                     : isCollected
-                      ? `linear-gradient(135deg, ${animal?.bgColor || '#fff'}, #fff)`
-                      : '#fff',
+                      ? `linear-gradient(135deg, ${animal?.bgColor || colors.cream}, ${colors.cream})`
+                      : colors.white,
                   cursor: 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: isPressed
-                    ? `0 1px 2px ${animal?.color || '#CE93D8'}40`
-                    : '0 2px 4px rgba(0,0,0,0.08)',
+                    ? `0 1px 4px ${animal?.color || colors.lavender}40`
+                    : `0 2px 6px ${colors.shadow}`,
                   padding: '2px',
                   position: 'relative',
                   overflow: 'hidden',
+                  fontFamily: fonts.heading,
                 }}
               >
-                {/* Letter */}
                 <span style={{
-                  fontSize: isCollected ? '0.7rem' : '0.85rem',
-                  fontWeight: 800,
+                  fontSize: isCollected ? 'min(2.5vw, 0.7rem)' : 'min(3vw, 0.85rem)',
+                  fontWeight: 700,
                   color: isPressed
-                    ? '#fff'
+                    ? colors.white
                     : isCollected
-                      ? animal?.color || '#7B1FA2'
-                      : '#666',
+                      ? animal?.color || colors.textAccent
+                      : colors.textLight,
                   lineHeight: 1,
+                  fontFamily: fonts.heading,
                 }}>
                   {letter}
                 </span>
 
-                {/* Tiny animal emoji if collected */}
                 {isCollected && animal && (
                   <span style={{
-                    fontSize: '0.7rem',
+                    fontSize: 'min(2.5vw, 0.7rem)',
                     lineHeight: 1,
                     marginTop: '1px',
                   }}>
@@ -141,7 +141,6 @@ export default function Keyboard({ collectedAnimals, onKeyClick }: Props) {
                   </span>
                 )}
 
-                {/* Glow effect on press */}
                 {isPressed && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0 }}
@@ -151,8 +150,8 @@ export default function Keyboard({ collectedAnimals, onKeyClick }: Props) {
                       position: 'absolute',
                       width: '100%',
                       height: '100%',
-                      borderRadius: '8px',
-                      background: animal?.color || '#CE93D8',
+                      borderRadius: radius.sm,
+                      background: animal?.color || colors.lavender,
                       pointerEvents: 'none',
                     }}
                   />

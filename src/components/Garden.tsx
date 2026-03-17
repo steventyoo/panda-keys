@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
+import { colors, gradients } from '../styles/theme';
 
-// Animated background garden scene
+// Animated background garden scene — soft kawaii palette
 export default function Garden() {
   return (
     <div style={{
@@ -8,7 +9,7 @@ export default function Garden() {
       inset: 0,
       zIndex: 0,
       overflow: 'hidden',
-      background: 'linear-gradient(180deg, #E8F5FE 0%, #FFF9E6 40%, #E8F8E8 70%, #C8E6C9 100%)',
+      background: gradients.garden,
     }}>
       {/* Sun */}
       <motion.div
@@ -21,8 +22,8 @@ export default function Garden() {
           width: '80px',
           height: '80px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, #FFE082, #FFD54F)',
-          boxShadow: '0 0 40px #FFE08280, 0 0 80px #FFE08240',
+          background: `radial-gradient(circle, ${colors.butter}, ${colors.peach})`,
+          boxShadow: `0 0 40px ${colors.butter}80, 0 0 80px ${colors.butter}40`,
         }}
       />
 
@@ -41,7 +42,7 @@ export default function Garden() {
             top: cloud.top,
             left: cloud.left,
             fontSize: `${cloud.size * 4}rem`,
-            opacity: 0.6,
+            opacity: 0.5,
             filter: 'blur(1px)',
           }}
         >
@@ -49,14 +50,14 @@ export default function Garden() {
         </motion.div>
       ))}
 
-      {/* Grass hills */}
+      {/* Grass hills — soft mint */}
       <div style={{
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
         height: '30%',
-        background: 'linear-gradient(180deg, #A5D6A7, #81C784)',
+        background: `linear-gradient(180deg, ${colors.mint}, ${colors.mintDeep})`,
         borderRadius: '50% 50% 0 0 / 20% 20% 0 0',
       }} />
 
@@ -88,8 +89,8 @@ export default function Garden() {
 
       {/* Butterflies */}
       {[
-        { color: '#F8BBD0', startX: '20%', startY: '40%' },
-        { color: '#CE93D8', startX: '70%', startY: '35%' },
+        { color: colors.pink, startX: '20%', startY: '40%' },
+        { color: colors.lavender, startX: '70%', startY: '35%' },
       ].map((b, i) => (
         <motion.div
           key={`butterfly-${i}`}
@@ -109,7 +110,7 @@ export default function Garden() {
         </motion.div>
       ))}
 
-      {/* Rainbow (subtle) */}
+      {/* Rainbow (subtle pastel) */}
       <div style={{
         position: 'absolute',
         top: '10%',
@@ -118,9 +119,9 @@ export default function Garden() {
         height: '150px',
         borderRadius: '150px 150px 0 0',
         border: '8px solid transparent',
-        borderTop: '8px solid #F4433620',
-        background: 'linear-gradient(180deg, #FF000008, #FF980008, #FFEB3B08, #4CAF5008, #2196F308, #9C27B008) padding-box',
-        opacity: 0.4,
+        borderTop: `8px solid ${colors.pink}20`,
+        background: `linear-gradient(180deg, ${colors.pink}08, ${colors.peach}08, ${colors.butter}08, ${colors.mint}08, ${colors.sky}08, ${colors.lavender}08) padding-box`,
+        opacity: 0.5,
       }} />
 
       {/* Pandas peeking from behind the hill */}

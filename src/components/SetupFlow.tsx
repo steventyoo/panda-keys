@@ -3,14 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '../context/GameContext';
 import type { FamilyMember } from '../context/GameContext';
 import { useSound } from '../hooks/useSound';
+import { colors, gradients, fonts, radius, kawaiiButton, kawaiiCard } from '../styles/theme';
 
 const KAWAII_COLORS = [
-  { base: '#F8B4C8', accent: '#FFD4E8' },
-  { base: '#B4D8F8', accent: '#D4ECFF' },
-  { base: '#C8E6C9', accent: '#E8F5E9' },
-  { base: '#FFE082', accent: '#FFF9E6' },
-  { base: '#CE93D8', accent: '#F3E5F5' },
-  { base: '#FFAB91', accent: '#FBE9E7' },
+  { base: colors.pink, accent: colors.blush },
+  { base: colors.sky, accent: `${colors.sky}40` },
+  { base: colors.mint, accent: `${colors.mint}40` },
+  { base: colors.peach, accent: `${colors.peach}40` },
+  { base: colors.lavender, accent: `${colors.lavender}40` },
+  { base: colors.butter, accent: `${colors.butter}60` },
 ];
 
 const ROLE_EMOJIS: Record<string, string> = {
@@ -24,7 +25,6 @@ const ROLE_EMOJIS: Record<string, string> = {
 
 const EYE_STYLES = ['round', 'sparkle', 'sleepy', 'happy'] as const;
 
-// Floating pandas decoration
 function FloatingPandas() {
   const pandas = [
     { top: '5%', left: '5%', delay: 0, size: '2.5rem' },
@@ -40,16 +40,8 @@ function FloatingPandas() {
       {pandas.map((p, i) => (
         <motion.div
           key={i}
-          animate={{
-            y: [0, -15, 0],
-            rotate: [-5, 5, -5],
-          }}
-          transition={{
-            duration: 3,
-            delay: p.delay,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
+          animate={{ y: [0, -15, 0], rotate: [-5, 5, -5] }}
+          transition={{ duration: 3, delay: p.delay, repeat: Infinity, ease: 'easeInOut' }}
           style={{
             position: 'fixed',
             top: p.top,
@@ -74,22 +66,16 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      style={{ textAlign: 'center', maxWidth: '500px' }}
+      style={{ textAlign: 'center', maxWidth: '500px', padding: '0 16px' }}
     >
-      {/* Big panda mascot */}
       <motion.div
-        animate={{
-          rotate: [-5, 5, -5],
-          scale: [1, 1.1, 1],
-          y: [0, -10, 0],
-        }}
+        animate={{ rotate: [-5, 5, -5], scale: [1, 1.1, 1], y: [0, -10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
-        style={{ fontSize: '6rem', marginBottom: '10px' }}
+        style={{ fontSize: '5rem', marginBottom: '10px' }}
       >
         🐼
       </motion.div>
 
-      {/* Little panda friends */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
         {['🐼', '🐼', '🐼'].map((p, i) => (
           <motion.span
@@ -104,14 +90,14 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
       </div>
 
       <h1 style={{
-        fontSize: '2.5rem',
-        color: '#7B1FA2',
+        fontSize: 'clamp(1.8rem, 6vw, 2.5rem)',
+        color: colors.textAccent,
         margin: '0 0 12px',
-        fontFamily: "'Nunito', system-ui, sans-serif",
+        fontFamily: fonts.fun,
       }}>
         Welcome to Panda Keys!
       </h1>
-      <p style={{ fontSize: '1.2rem', color: '#9C27B0', margin: '0 0 30px' }}>
+      <p style={{ fontSize: '1.2rem', color: colors.textMedium, margin: '0 0 30px', fontFamily: fonts.body }}>
         Type with your panda friends! 🎋
       </p>
       <motion.button
@@ -119,15 +105,9 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
         whileTap={{ scale: 0.95 }}
         onClick={onNext}
         style={{
-          background: 'linear-gradient(135deg, #CE93D8, #F48FB1)',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '20px',
+          ...kawaiiButton(),
           padding: '16px 48px',
           fontSize: '1.3rem',
-          fontWeight: 800,
-          cursor: 'pointer',
-          boxShadow: '0 4px 20px rgba(206, 147, 216, 0.5)',
         }}
       >
         Let's Go! 🐼
@@ -164,9 +144,8 @@ function NameStep({ onNext }: { onNext: () => void }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      style={{ textAlign: 'center', maxWidth: '500px' }}
+      style={{ textAlign: 'center', maxWidth: '500px', padding: '0 16px' }}
     >
-      {/* Panda asking your name */}
       <motion.div
         animate={{ rotate: [-3, 3, -3] }}
         transition={{ duration: 2, repeat: Infinity }}
@@ -178,16 +157,14 @@ function NameStep({ onNext }: { onNext: () => void }) {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         style={{
-          background: '#fff',
-          borderRadius: '16px',
+          ...kawaiiCard(colors.lavender),
           padding: '8px 16px',
           display: 'inline-block',
           marginBottom: '16px',
-          border: '2px solid #E0E0E0',
           position: 'relative',
         }}
       >
-        <span style={{ fontSize: '0.9rem', color: '#5D4037' }}>Hi there! What's your name?</span>
+        <span style={{ fontSize: '0.9rem', color: colors.textDark, fontFamily: fonts.body }}>Hi there! What's your name?</span>
         <div style={{
           position: 'absolute',
           top: '-8px',
@@ -197,7 +174,7 @@ function NameStep({ onNext }: { onNext: () => void }) {
           height: 0,
           borderLeft: '8px solid transparent',
           borderRight: '8px solid transparent',
-          borderBottom: '8px solid #E0E0E0',
+          borderBottom: `8px solid ${colors.lavender}40`,
         }} />
       </motion.div>
 
@@ -210,15 +187,17 @@ function NameStep({ onNext }: { onNext: () => void }) {
         style={{
           width: '100%',
           padding: '16px 24px',
-          fontSize: '1.5rem',
-          borderRadius: '16px',
-          border: '3px solid #CE93D8',
+          fontSize: 'clamp(1.1rem, 4vw, 1.5rem)',
+          borderRadius: radius.md,
+          border: `2.5px solid ${colors.lavender}`,
           outline: 'none',
           textAlign: 'center',
           fontWeight: 700,
-          color: '#7B1FA2',
-          background: '#FAF0FF',
+          color: colors.textAccent,
+          background: colors.cream,
           marginBottom: '16px',
+          fontFamily: fonts.heading,
+          boxSizing: 'border-box',
         }}
         onKeyDown={e => {
           if (e.key === 'Enter') handleSubmit();
@@ -226,10 +205,10 @@ function NameStep({ onNext }: { onNext: () => void }) {
       />
 
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ fontSize: '1rem', color: '#9C27B0', fontWeight: 700 }}>
+        <label style={{ fontSize: '1rem', color: colors.textAccent, fontWeight: 700, fontFamily: fonts.heading }}>
           How old are you?
         </label>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
           {[5, 6, 7, 8, 9, 10].map(a => (
             <motion.button
               key={a}
@@ -239,13 +218,14 @@ function NameStep({ onNext }: { onNext: () => void }) {
               style={{
                 width: '48px',
                 height: '48px',
-                borderRadius: '50%',
-                border: `3px solid ${age === a ? '#CE93D8' : '#E0E0E0'}`,
-                background: age === a ? '#CE93D8' : '#fff',
-                color: age === a ? '#fff' : '#666',
+                borderRadius: radius.full,
+                border: `2.5px solid ${age === a ? colors.lavender : colors.lavender + '40'}`,
+                background: age === a ? gradients.primary : colors.cream,
+                color: age === a ? colors.white : colors.textMedium,
                 fontSize: '1.2rem',
                 fontWeight: 700,
                 cursor: 'pointer',
+                fontFamily: fonts.heading,
               }}
             >
               {a}
@@ -254,10 +234,9 @@ function NameStep({ onNext }: { onNext: () => void }) {
         </div>
       </div>
 
-      {/* Photo upload */}
       <div style={{ marginBottom: '20px' }}>
-        <label style={{ fontSize: '0.9rem', color: '#9C27B0', fontWeight: 700 }}>
-          Upload your photo (we'll make you a kawaii panda!)
+        <label style={{ fontSize: '0.9rem', color: colors.textAccent, fontWeight: 700, fontFamily: fonts.heading }}>
+          Upload your photo (we'll make you kawaii!)
         </label>
         <div style={{ marginTop: '8px' }}>
           {state.playerPhotoUrl ? (
@@ -267,7 +246,7 @@ function NameStep({ onNext }: { onNext: () => void }) {
                 height: '70px',
                 borderRadius: '50%',
                 overflow: 'hidden',
-                border: '3px solid #CE93D8',
+                border: `3px solid ${colors.lavender}`,
               }}>
                 <img src={state.playerPhotoUrl} alt="You" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
@@ -285,28 +264,29 @@ function NameStep({ onNext }: { onNext: () => void }) {
                   width: '70px',
                   height: '70px',
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #E0E0E0, #F5F5F5)',
+                  background: `linear-gradient(135deg, ${colors.blush}, ${colors.cream})`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '3px solid #CE93D8',
+                  border: `3px solid ${colors.lavender}`,
                   fontSize: '2.5rem',
                 }}
               >
                 🐼
               </motion.div>
-              <span style={{ fontSize: '0.75rem', color: '#9C27B0', maxWidth: '80px' }}>Your kawaii panda!</span>
+              <span style={{ fontSize: '0.75rem', color: colors.textAccent, maxWidth: '80px', fontFamily: fonts.body }}>Your kawaii avatar!</span>
             </div>
           ) : (
             <label style={{
               display: 'inline-block',
               padding: '8px 20px',
-              background: '#F3E5F5',
-              borderRadius: '12px',
-              border: '2px dashed #CE93D8',
+              background: colors.cream,
+              borderRadius: radius.sm,
+              border: `2px dashed ${colors.lavender}`,
               cursor: 'pointer',
-              color: '#7B1FA2',
+              color: colors.textAccent,
               fontWeight: 600,
+              fontFamily: fonts.body,
             }}>
               📷 Choose Photo
               <input type="file" accept="image/*" onChange={handlePlayerPhotoUpload} style={{ display: 'none' }} />
@@ -321,13 +301,10 @@ function NameStep({ onNext }: { onNext: () => void }) {
         onClick={handleSubmit}
         disabled={!name.trim()}
         style={{
-          background: name.trim() ? 'linear-gradient(135deg, #CE93D8, #F48FB1)' : '#E0E0E0',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '20px',
+          ...kawaiiButton(),
+          background: name.trim() ? gradients.primary : `${colors.lavender}40`,
           padding: '14px 40px',
           fontSize: '1.2rem',
-          fontWeight: 800,
           cursor: name.trim() ? 'pointer' : 'default',
         }}
       >
@@ -380,9 +357,8 @@ function FamilyStep() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      style={{ textAlign: 'center', maxWidth: '600px', width: '100%' }}
+      style={{ textAlign: 'center', maxWidth: '600px', width: '100%', padding: '0 16px' }}
     >
-      {/* Panda family */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', marginBottom: '12px' }}>
         {['🐼', '🐼', '🐼', '🐼'].map((p, i) => (
           <motion.span
@@ -396,14 +372,13 @@ function FamilyStep() {
         ))}
       </div>
 
-      <h2 style={{ fontSize: '1.8rem', color: '#7B1FA2', margin: '0 0 8px' }}>
+      <h2 style={{ fontSize: 'clamp(1.3rem, 5vw, 1.8rem)', color: colors.textAccent, margin: '0 0 8px', fontFamily: fonts.fun }}>
         {state.playerName}'s Panda Family
       </h2>
-      <p style={{ fontSize: '1rem', color: '#9C27B0', margin: '0 0 24px' }}>
+      <p style={{ fontSize: '1rem', color: colors.textMedium, margin: '0 0 24px', fontFamily: fonts.body }}>
         Add your family, pets & friends! They become pandas too! 🐼
       </p>
 
-      {/* Added members */}
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
         {state.family.map(member => (
           <motion.div
@@ -412,8 +387,8 @@ function FamilyStep() {
             animate={{ scale: 1 }}
             style={{
               background: `linear-gradient(135deg, ${member.kawaiiStyle.accentColor}, ${member.kawaiiStyle.baseColor}40)`,
-              border: `3px solid ${member.kawaiiStyle.baseColor}`,
-              borderRadius: '16px',
+              border: `2.5px solid ${member.kawaiiStyle.baseColor}60`,
+              borderRadius: radius.md,
               padding: '12px 16px',
               display: 'flex',
               alignItems: 'center',
@@ -438,8 +413,8 @@ function FamilyStep() {
               <span style={{ fontSize: '1.5rem' }}>🐼</span>
             )}
             <div style={{ textAlign: 'left' }}>
-              <div style={{ fontWeight: 700, color: '#5D4037', fontSize: '0.9rem' }}>{member.name}</div>
-              <div style={{ fontSize: '0.7rem', color: '#795548' }}>{member.role}</div>
+              <div style={{ fontWeight: 700, color: colors.textDark, fontSize: '0.9rem', fontFamily: fonts.heading }}>{member.name}</div>
+              <div style={{ fontSize: '0.7rem', color: colors.textMedium, fontFamily: fonts.body }}>{member.role}</div>
             </div>
             <motion.button
               whileHover={{ scale: 1.2 }}
@@ -452,8 +427,8 @@ function FamilyStep() {
                 width: '20px',
                 height: '20px',
                 borderRadius: '50%',
-                background: '#FF5252',
-                color: '#fff',
+                background: colors.pinkDeep,
+                color: colors.white,
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '0.7rem',
@@ -469,16 +444,13 @@ function FamilyStep() {
         ))}
       </div>
 
-      {/* Add member form */}
       {addingMember ? (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           style={{
-            background: '#ffffffcc',
-            borderRadius: '20px',
+            ...kawaiiCard(colors.lavender),
             padding: '20px',
-            border: '3px solid #CE93D8',
             marginBottom: '20px',
           }}
         >
@@ -491,15 +463,17 @@ function FamilyStep() {
                 onClick={() => setMemberRole(role)}
                 style={{
                   padding: '8px 14px',
-                  borderRadius: '12px',
-                  border: `2px solid ${memberRole === role ? '#CE93D8' : '#E0E0E0'}`,
-                  background: memberRole === role ? '#F3E5F5' : '#fff',
+                  borderRadius: radius.sm,
+                  border: `2px solid ${memberRole === role ? colors.lavender : colors.lavender + '30'}`,
+                  background: memberRole === role ? `${colors.lavender}30` : colors.cream,
                   cursor: 'pointer',
                   fontSize: '0.85rem',
                   fontWeight: 600,
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
+                  fontFamily: fonts.body,
+                  color: colors.textDark,
                 }}
               >
                 {emoji} {role}
@@ -516,19 +490,19 @@ function FamilyStep() {
               width: '100%',
               padding: '12px',
               fontSize: '1.1rem',
-              borderRadius: '12px',
-              border: '2px solid #CE93D8',
+              borderRadius: radius.sm,
+              border: `2px solid ${colors.lavender}`,
               outline: 'none',
               textAlign: 'center',
               fontWeight: 600,
-              color: '#7B1FA2',
-              background: '#FAF0FF',
+              color: colors.textAccent,
+              background: colors.cream,
               marginBottom: '12px',
               boxSizing: 'border-box',
+              fontFamily: fonts.heading,
             }}
           />
 
-          {/* Photo upload */}
           <div style={{ marginBottom: '12px' }}>
             {memberPhoto ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
@@ -537,14 +511,14 @@ function FamilyStep() {
                   height: '50px',
                   borderRadius: '50%',
                   overflow: 'hidden',
-                  border: '2px solid #CE93D8',
+                  border: `2px solid ${colors.lavender}`,
                 }}>
                   <img src={memberPhoto} alt="Member" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <span>→ 🐼</span>
                 <button
                   onClick={() => setMemberPhoto(null)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#FF5252', fontSize: '0.8rem' }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: colors.pinkDeep, fontSize: '0.8rem', fontFamily: fonts.body }}
                 >
                   Remove
                 </button>
@@ -553,15 +527,16 @@ function FamilyStep() {
               <label style={{
                 display: 'inline-block',
                 padding: '6px 14px',
-                background: '#F3E5F5',
-                borderRadius: '10px',
-                border: '2px dashed #CE93D8',
+                background: colors.cream,
+                borderRadius: radius.sm,
+                border: `2px dashed ${colors.lavender}`,
                 cursor: 'pointer',
-                color: '#7B1FA2',
+                color: colors.textAccent,
                 fontSize: '0.85rem',
                 fontWeight: 600,
+                fontFamily: fonts.body,
               }}>
-                📷 Add Photo (becomes a panda!)
+                📷 Add Photo (becomes kawaii!)
                 <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
               </label>
             )}
@@ -574,12 +549,9 @@ function FamilyStep() {
               onClick={handleAddMember}
               disabled={!memberName.trim()}
               style={{
-                background: memberName.trim() ? '#CE93D8' : '#E0E0E0',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '12px',
+                ...kawaiiButton(colors.lavender, memberName.trim() ? gradients.primary : `${colors.lavender}40`),
                 padding: '10px 24px',
-                fontWeight: 700,
+                fontSize: '1rem',
                 cursor: memberName.trim() ? 'pointer' : 'default',
               }}
             >
@@ -590,13 +562,15 @@ function FamilyStep() {
               whileTap={{ scale: 0.95 }}
               onClick={() => { setAddingMember(false); setMemberName(''); setMemberPhoto(null); }}
               style={{
-                background: '#fff',
-                color: '#999',
-                border: '2px solid #E0E0E0',
-                borderRadius: '12px',
+                background: colors.cream,
+                color: colors.textLight,
+                border: `2px solid ${colors.lavender}30`,
+                borderRadius: radius.xl,
                 padding: '10px 24px',
                 fontWeight: 700,
                 cursor: 'pointer',
+                fontFamily: fonts.heading,
+                fontSize: '1rem',
               }}
             >
               Cancel
@@ -609,15 +583,16 @@ function FamilyStep() {
           whileTap={{ scale: 0.95 }}
           onClick={() => setAddingMember(true)}
           style={{
-            background: '#fff',
-            border: '3px dashed #CE93D8',
-            borderRadius: '16px',
+            background: colors.cream,
+            border: `2.5px dashed ${colors.lavender}`,
+            borderRadius: radius.md,
             padding: '14px 28px',
             fontSize: '1rem',
             fontWeight: 700,
-            color: '#7B1FA2',
+            color: colors.textAccent,
             cursor: 'pointer',
             marginBottom: '20px',
+            fontFamily: fonts.heading,
           }}
         >
           + Add Family, Pet, or Friend 🐼
@@ -633,15 +608,9 @@ function FamilyStep() {
             play('celebrate');
           }}
           style={{
-            background: 'linear-gradient(135deg, #CE93D8, #F48FB1)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '20px',
+            ...kawaiiButton(),
             padding: '16px 48px',
             fontSize: '1.3rem',
-            fontWeight: 800,
-            cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(206, 147, 216, 0.5)',
           }}
         >
           Start Playing! 🐼🎮
@@ -670,6 +639,7 @@ export default function SetupFlow() {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '20px',
+      overflow: 'auto',
     }}>
       <FloatingPandas />
       <AnimatePresence mode="wait">

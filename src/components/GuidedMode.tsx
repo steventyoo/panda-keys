@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getAnimalForLetter, animals } from '../data/animals';
+import { getAnimalForLetter } from '../data/animals';
 import KawaiiAnimalDisplay from './KawaiiAnimalDisplay';
 import Keyboard from './Keyboard';
 import Confetti from './Confetti';
 import { useSound } from '../hooks/useSound';
 import { useGame } from '../context/GameContext';
+import { colors, fonts, radius, kawaiiCard } from '../styles/theme';
 
 const ROUNDS_FOR_PARADE = 5;
 
@@ -17,7 +18,6 @@ export default function GuidedMode() {
   const [showParade, setShowParade] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // Pick a random target letter
   const pickNewTarget = useCallback(() => {
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const letter = letters[Math.floor(Math.random() * letters.length)];
@@ -45,7 +45,6 @@ export default function GuidedMode() {
     dispatch({ type: 'KEY_PRESSED' });
 
     if (key === state.guidedTarget) {
-      // Correct!
       dispatch({ type: 'GUIDED_CORRECT' });
       dispatch({ type: 'COLLECT_ANIMAL', letter: key });
       setShowAnimal(true);
@@ -58,7 +57,6 @@ export default function GuidedMode() {
 
       setTimeout(() => setShowConfetti(false), 3000);
 
-      // Check for parade
       if ((state.guidedRound + 1) % ROUNDS_FOR_PARADE === 0) {
         setTimeout(() => {
           setShowParade(true);
@@ -72,7 +70,6 @@ export default function GuidedMode() {
         setTimeout(() => pickNewTarget(), 2500);
       }
     } else {
-      // Wrong
       dispatch({ type: 'GUIDED_WRONG' });
       play('wrong');
       setShowWrong(true);
@@ -97,7 +94,7 @@ export default function GuidedMode() {
     }}>
       {/* Header */}
       <div style={{
-        padding: '20px',
+        padding: '16px',
         width: '100%',
         display: 'flex',
         justifyContent: 'space-between',
@@ -111,37 +108,37 @@ export default function GuidedMode() {
             dispatch({ type: 'RESET_GUIDED' });
           }}
           style={{
-            background: '#fff',
-            border: '3px solid #F8BBD0',
-            borderRadius: '16px',
+            ...kawaiiCard(colors.pink),
             padding: '8px 16px',
             fontSize: '1rem',
             cursor: 'pointer',
             fontWeight: 700,
-            color: '#E91E63',
+            color: colors.pinkDeep,
+            fontFamily: fonts.heading,
+            border: `2.5px solid ${colors.pink}60`,
           }}
         >
           ← Back
         </motion.button>
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
           <div style={{
-            background: '#fff',
-            borderRadius: '16px',
+            ...kawaiiCard(colors.mint),
             padding: '8px 16px',
-            border: '3px solid #81C784',
             fontWeight: 700,
-            color: '#388E3C',
+            color: colors.mintDeep,
+            fontFamily: fonts.heading,
+            border: `2.5px solid ${colors.mint}60`,
           }}>
             ⭐ {state.guidedScore}
           </div>
           <div style={{
-            background: '#fff',
-            borderRadius: '16px',
+            ...kawaiiCard(colors.peach),
             padding: '8px 16px',
-            border: '3px solid #FFB74D',
             fontWeight: 700,
-            color: '#F57C00',
+            color: colors.textMedium,
+            fontFamily: fonts.heading,
+            border: `2.5px solid ${colors.peach}60`,
           }}>
             🔥 {state.currentStreak}
           </div>
@@ -156,8 +153,8 @@ export default function GuidedMode() {
         alignItems: 'center',
         justifyContent: 'center',
         gap: '30px',
+        padding: '0 16px',
       }}>
-        {/* Silhouette / hint */}
         <AnimatePresence mode="wait">
           {!showAnimal && !showParade && targetAnimal && (
             <motion.div
@@ -167,12 +164,11 @@ export default function GuidedMode() {
               exit={{ opacity: 0, scale: 0.5 }}
               style={{ textAlign: 'center' }}
             >
-              {/* Silhouette of animal */}
               <motion.div
                 animate={{ y: [0, -10, 0], rotate: [-2, 2, -2] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 style={{
-                  fontSize: '6rem',
+                  fontSize: 'clamp(4rem, 12vw, 6rem)',
                   filter: 'grayscale(100%) brightness(0.2)',
                   opacity: 0.3,
                   marginBottom: '20px',
@@ -181,34 +177,32 @@ export default function GuidedMode() {
                 {targetAnimal.emoji}
               </motion.div>
 
-              {/* "Find the letter" prompt */}
               <motion.div
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
                 style={{
-                  fontSize: '2.5rem',
-                  fontWeight: 900,
-                  color: '#7B1FA2',
-                  background: '#ffffffdd',
-                  borderRadius: '24px',
-                  padding: '20px 40px',
-                  border: '4px solid #CE93D8',
-                  boxShadow: '0 8px 30px rgba(156, 39, 176, 0.2)',
+                  fontSize: 'clamp(1.5rem, 5vw, 2.5rem)',
+                  fontWeight: 700,
+                  color: colors.textAccent,
+                  ...kawaiiCard(colors.lavender),
+                  padding: '20px 30px',
+                  border: `3px solid ${colors.lavender}`,
+                  fontFamily: fonts.heading,
                 }}
               >
                 Find the <span style={{
                   color: targetAnimal.color,
-                  fontSize: '3.5rem',
+                  fontSize: 'clamp(2rem, 7vw, 3.5rem)',
                   textShadow: `0 2px 4px ${targetAnimal.color}60`,
+                  fontFamily: fonts.fun,
                 }}>{state.guidedTarget}</span>
-                <div style={{ fontSize: '1rem', color: '#9C27B0', marginTop: '8px' }}>
+                <div style={{ fontSize: 'clamp(0.8rem, 2.5vw, 1rem)', color: colors.textMedium, marginTop: '8px', fontFamily: fonts.body }}>
                   Who's hiding? 👀
                 </div>
               </motion.div>
             </motion.div>
           )}
 
-          {/* Correct - show animal */}
           {showAnimal && targetAnimal && (
             <motion.div
               key="animal"
@@ -229,18 +223,18 @@ export default function GuidedMode() {
                 transition={{ delay: 0.3 }}
                 style={{
                   marginTop: '20px',
-                  fontSize: '2rem',
-                  fontWeight: 900,
-                  color: '#4CAF50',
-                  background: '#ffffffdd',
-                  borderRadius: '16px',
+                  fontSize: 'clamp(1.3rem, 4vw, 2rem)',
+                  fontWeight: 700,
+                  color: colors.mintDeep,
+                  ...kawaiiCard(colors.mint),
                   padding: '12px 32px',
-                  border: '3px solid #81C784',
+                  border: `3px solid ${colors.mint}`,
+                  fontFamily: fonts.fun,
                 }}
               >
                 🎉 YAY! 🎉
                 {state.playerName && (
-                  <div style={{ fontSize: '1rem', color: '#388E3C' }}>
+                  <div style={{ fontSize: 'clamp(0.8rem, 2.5vw, 1rem)', color: colors.textMedium, fontFamily: fonts.body }}>
                     Great job, {state.playerName}!
                   </div>
                 )}
@@ -263,12 +257,12 @@ export default function GuidedMode() {
                 transform: 'translate(-50%, -50%)',
                 fontSize: '1.5rem',
                 fontWeight: 700,
-                color: '#FF9800',
-                background: '#FFF3E0',
-                borderRadius: '16px',
+                color: colors.textMedium,
+                ...kawaiiCard(colors.peach),
                 padding: '12px 24px',
-                border: '3px solid #FFB74D',
+                border: `3px solid ${colors.peach}`,
                 zIndex: 50,
+                fontFamily: fonts.heading,
               }}
             >
               Try again! 💪
@@ -289,13 +283,13 @@ export default function GuidedMode() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'rgba(255,255,255,0.8)',
+                background: `${colors.cream}cc`,
                 zIndex: 40,
               }}
             >
               <div style={{ textAlign: 'center' }}>
                 <motion.div
-                  style={{ fontSize: '2rem', fontWeight: 900, color: '#7B1FA2', marginBottom: '20px' }}
+                  style={{ fontSize: 'clamp(1.3rem, 4vw, 2rem)', fontWeight: 700, color: colors.textAccent, marginBottom: '20px', fontFamily: fonts.fun }}
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
@@ -329,7 +323,6 @@ export default function GuidedMode() {
         </AnimatePresence>
       </div>
 
-      {/* Visual QWERTY Keyboard */}
       <Keyboard collectedAnimals={state.collectedAnimals} />
 
       {showConfetti && !showParade && <Confetti />}

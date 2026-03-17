@@ -1,4 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* 🌈 Kawaii Core Palette */
+  --pink: #FFB6C1;
+  --blush: #FFDDE2;
+  --lavender: #CDB4DB;
+  --cream: #FFF8E7;
+  --sky: #AEE1F9;
+  --mint: #B8F2E6;
+
+  /* Extended */
+  --pink-deep: #F48FB1;
+  --lavender-deep: #AB87C4;
+  --sky-deep: #81D4FA;
+  --mint-deep: #80CBC4;
+  --peach: #FFE0B2;
+  --butter: #FFF9C4;
+
+  /* Text */
+  --text-dark: #5D4037;
+  --text-medium: #8D6E63;
+  --text-light: #A1887F;
+  --text-accent: #7B1FA2;
+
+  /* Fonts */
+  --font-heading: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+  --font-fun: 'Baloo 2', 'Fredoka', system-ui, sans-serif;
+}
 
 * {
   margin: 0;
@@ -7,11 +36,16 @@
 }
 
 body {
-  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
   overflow-x: hidden;
-  background: #E8F5FE;
+  background: var(--cream);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: var(--text-dark);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-heading);
 }
 
 #root {
@@ -26,37 +60,44 @@ body {
   -webkit-user-select: none;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - kawaii style */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F3E5F5;
-  border-radius: 4px;
+  background: var(--blush);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CE93D8;
-  border-radius: 4px;
+  background: linear-gradient(180deg, var(--pink), var(--lavender));
+  border-radius: 10px;
+  border: 2px solid var(--blush);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #AB47BC;
+  background: linear-gradient(180deg, var(--pink-deep), var(--lavender-deep));
 }
 
-/* Focus styles for accessibility */
+/* Focus styles */
 button:focus-visible,
 input:focus-visible {
-  outline: 3px solid #CE93D8;
+  outline: 3px solid var(--lavender);
   outline-offset: 2px;
 }
 
 /* Smooth transitions */
 button {
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  font-family: var(--font-heading);
+}
+
+input {
+  font-family: var(--font-body);
 }
 
 input::placeholder {
-  color: #CE93D880;
+  color: var(--lavender);
+  opacity: 0.6;
 }

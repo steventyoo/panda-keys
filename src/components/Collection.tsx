@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { animals, getAnimalForLetter } from '../data/animals';
+import { getAnimalForLetter } from '../data/animals';
 import KawaiiAnimalDisplay from './KawaiiAnimalDisplay';
 import { useGame } from '../context/GameContext';
 import { useSound } from '../hooks/useSound';
+import { colors, fonts, radius, kawaiiCard } from '../styles/theme';
 
 export default function Collection() {
   const { state, dispatch } = useGame();
@@ -16,7 +17,7 @@ export default function Collection() {
       zIndex: 1,
       width: '100%',
       minHeight: '100vh',
-      padding: '20px',
+      padding: '16px',
     }}>
       {/* Header */}
       <div style={{
@@ -24,33 +25,35 @@ export default function Collection() {
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: '24px',
+        flexWrap: 'wrap',
+        gap: '8px',
       }}>
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => dispatch({ type: 'SET_MODE', mode: 'menu' })}
           style={{
-            background: '#fff',
-            border: '3px solid #F8BBD0',
-            borderRadius: '16px',
+            ...kawaiiCard(colors.pink),
             padding: '8px 16px',
             fontSize: '1rem',
             cursor: 'pointer',
             fontWeight: 700,
-            color: '#E91E63',
+            color: colors.pinkDeep,
+            fontFamily: fonts.heading,
+            border: `2.5px solid ${colors.pink}60`,
           }}
         >
           ← Back
         </motion.button>
 
         <div style={{
-          fontSize: '1.5rem',
-          fontWeight: 900,
-          color: '#7B1FA2',
-          background: '#ffffffcc',
-          borderRadius: '16px',
-          padding: '8px 24px',
-          border: '3px solid #CE93D8',
+          fontSize: 'clamp(1rem, 3vw, 1.5rem)',
+          fontWeight: 700,
+          color: colors.textAccent,
+          ...kawaiiCard(colors.lavender),
+          padding: '8px 20px',
+          border: `2.5px solid ${colors.lavender}40`,
+          fontFamily: fonts.heading,
         }}>
           🐾 {state.playerName ? `${state.playerName}'s` : 'My'} Critters: {state.collectedAnimals.length}/26
         </div>
@@ -59,11 +62,11 @@ export default function Collection() {
       {/* Animal grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
-        gap: '16px',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(min(130px, 28vw), 1fr))',
+        gap: '12px',
         maxWidth: '900px',
         margin: '0 auto',
-        padding: '20px',
+        padding: '10px',
       }}>
         {allLetters.map((letter, i) => {
           const collected = state.collectedAnimals.includes(letter);
@@ -80,9 +83,9 @@ export default function Collection() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 padding: '12px',
-                borderRadius: '20px',
-                background: collected ? '#ffffffcc' : '#f5f5f5aa',
-                border: collected ? `3px solid ${animal?.color || '#ddd'}` : '3px dashed #ddd',
+                borderRadius: radius.lg,
+                background: collected ? colors.cardBg : `${colors.cream}aa`,
+                border: collected ? `2.5px solid ${animal?.color || colors.lavender}50` : `2.5px dashed ${colors.lavender}30`,
                 cursor: collected ? 'pointer' : 'default',
               }}
               whileHover={collected ? { scale: 1.05, y: -5 } : {}}
@@ -103,14 +106,13 @@ export default function Collection() {
                 <div style={{
                   width: '80px',
                   height: '80px',
-                  borderRadius: '24px',
-                  background: '#E0E0E0',
+                  borderRadius: radius.lg,
+                  background: `${colors.lavender}20`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   position: 'relative',
                 }}>
-                  {/* Egg */}
                   <motion.div
                     animate={{ rotate: [-3, 3, -3] }}
                     transition={{ duration: 2, repeat: Infinity }}
@@ -122,12 +124,13 @@ export default function Collection() {
                     position: 'absolute',
                     bottom: '-8px',
                     fontSize: '0.7rem',
-                    fontWeight: 800,
-                    color: '#BDBDBD',
-                    background: '#F5F5F5',
-                    borderRadius: '6px',
+                    fontWeight: 700,
+                    color: colors.textLight,
+                    background: colors.cream,
+                    borderRadius: radius.sm,
                     padding: '1px 8px',
-                    border: '2px solid #E0E0E0',
+                    border: `2px solid ${colors.lavender}30`,
+                    fontFamily: fonts.heading,
                   }}>
                     {letter}
                   </div>
@@ -146,25 +149,25 @@ export default function Collection() {
           textAlign: 'center',
           marginTop: '24px',
           padding: '16px',
-          background: '#ffffffcc',
-          borderRadius: '16px',
-          border: '3px solid #CE93D8',
+          ...kawaiiCard(colors.lavender),
+          border: `2.5px solid ${colors.lavender}40`,
           maxWidth: '500px',
           margin: '24px auto',
+          fontFamily: fonts.heading,
         }}
       >
         {state.collectedAnimals.length === 0 && (
-          <div style={{ fontSize: '1.1rem', color: '#7B1FA2', fontWeight: 700 }}>
+          <div style={{ fontSize: '1.1rem', color: colors.textAccent, fontWeight: 700 }}>
             🥚 Play to hatch your critters! 🥚
           </div>
         )}
         {state.collectedAnimals.length > 0 && state.collectedAnimals.length < 26 && (
-          <div style={{ fontSize: '1.1rem', color: '#7B1FA2', fontWeight: 700 }}>
+          <div style={{ fontSize: '1.1rem', color: colors.textAccent, fontWeight: 700 }}>
             ✨ {26 - state.collectedAnimals.length} more critters to discover! ✨
           </div>
         )}
         {state.collectedAnimals.length === 26 && (
-          <div style={{ fontSize: '1.3rem', color: '#4CAF50', fontWeight: 900 }}>
+          <div style={{ fontSize: '1.3rem', color: colors.mintDeep, fontWeight: 700 }}>
             🎉 You collected ALL 26 critters! 🎉
           </div>
         )}

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useGame } from '../context/GameContext';
 import { useSound } from '../hooks/useSound';
+import { colors, gradients, fonts, radius, kawaiiButton, kawaiiCard } from '../styles/theme';
 
 export default function MainMenu() {
   const { state, dispatch } = useGame();
@@ -11,29 +12,29 @@ export default function MainMenu() {
       title: '🌸 Explore Garden',
       subtitle: 'Press any key for surprises!',
       mode: 'freeplay' as const,
-      color: '#CE93D8',
-      bgColor: '#F3E5F5',
+      color: colors.lavender,
+      bgColor: colors.blush,
     },
     {
       title: '🎯 Find the Letter',
       subtitle: 'Match letters to unlock critters!',
       mode: 'guided' as const,
-      color: '#81C784',
-      bgColor: '#E8F5E9',
+      color: colors.mint,
+      bgColor: `${colors.mint}30`,
     },
     {
       title: '🐾 My Critters',
       subtitle: `${state.collectedAnimals.length}/26 collected`,
       mode: 'collection' as const,
-      color: '#FFB74D',
-      bgColor: '#FFF3E0',
+      color: colors.peach,
+      bgColor: `${colors.peach}40`,
     },
     {
       title: '🎨 Art Studio',
       subtitle: 'Generate kawaii art with AI!',
       mode: 'artgen' as const,
-      color: '#F48FB1',
-      bgColor: '#FCE4EC',
+      color: colors.pink,
+      bgColor: `${colors.pink}30`,
     },
   ];
 
@@ -60,11 +61,14 @@ export default function MainMenu() {
           animate={{ scale: [1, 1.03, 1] }}
           transition={{ duration: 3, repeat: Infinity }}
           style={{
-            fontSize: '3.5rem',
-            color: '#7B1FA2',
+            fontSize: 'clamp(2.2rem, 8vw, 3.5rem)',
+            color: colors.textAccent,
             margin: 0,
-            textShadow: '0 3px 6px rgba(123, 31, 162, 0.2)',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
+            textShadow: `0 3px 10px ${colors.lavender}60`,
+            fontFamily: fonts.fun,
+            letterSpacing: '1px',
+            whiteSpace: 'nowrap',
+            textAlign: 'center',
           }}
         >
           ✨ Panda Keys ✨
@@ -76,9 +80,10 @@ export default function MainMenu() {
             transition={{ delay: 0.3 }}
             style={{
               fontSize: '1.3rem',
-              color: '#9C27B0',
+              color: colors.textMedium,
               margin: '8px 0 0',
               fontWeight: 600,
+              fontFamily: fonts.body,
             }}
           >
             Welcome back, {state.playerName}! 🌟
@@ -122,7 +127,7 @@ export default function MainMenu() {
                 ) : (
                   <span style={{ fontSize: '1.5rem' }}>{member.avatar}</span>
                 )}
-                <span style={{ fontSize: '0.6rem', color: '#795548', fontWeight: 600 }}>
+                <span style={{ fontSize: '0.6rem', color: colors.textMedium, fontWeight: 600, fontFamily: fonts.body }}>
                   {member.name}
                 </span>
               </motion.div>
@@ -148,18 +153,19 @@ export default function MainMenu() {
             width: '100%',
             maxWidth: '400px',
             padding: '20px 28px',
-            borderRadius: '20px',
-            border: `3px solid ${item.color}`,
-            background: `linear-gradient(135deg, ${item.bgColor}, #fff)`,
+            borderRadius: radius.lg,
+            border: `2.5px solid ${item.color}60`,
+            background: `linear-gradient(135deg, ${item.bgColor}, ${colors.cream})`,
             cursor: 'pointer',
             textAlign: 'left',
-            boxShadow: `0 4px 15px ${item.color}30`,
+            boxShadow: `0 4px 15px ${item.color}25`,
+            backdropFilter: 'blur(8px)',
           }}
         >
-          <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#5D4037' }}>
+          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: colors.textDark, fontFamily: fonts.heading }}>
             {item.title}
           </div>
-          <div style={{ fontSize: '0.9rem', color: '#795548', fontWeight: 500, marginTop: '4px' }}>
+          <div style={{ fontSize: '0.9rem', color: colors.textMedium, fontWeight: 500, marginTop: '4px', fontFamily: fonts.body }}>
             {item.subtitle}
           </div>
         </motion.button>
@@ -183,9 +189,9 @@ export default function MainMenu() {
           style={{
             width: '48px',
             height: '48px',
-            borderRadius: '50%',
-            border: '2px solid #E0E0E0',
-            background: '#fff',
+            borderRadius: radius.full,
+            border: `2px solid ${colors.lavender}50`,
+            background: colors.cream,
             cursor: 'pointer',
             fontSize: '1.2rem',
           }}
@@ -196,18 +202,18 @@ export default function MainMenu() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => {
-            // Reset to setup
             dispatch({ type: 'SET_MODE', mode: 'setup' });
           }}
           style={{
             padding: '8px 16px',
-            borderRadius: '24px',
-            border: '2px solid #E0E0E0',
-            background: '#fff',
+            borderRadius: radius.full,
+            border: `2px solid ${colors.lavender}50`,
+            background: colors.cream,
             cursor: 'pointer',
             fontSize: '0.85rem',
             fontWeight: 600,
-            color: '#999',
+            color: colors.textLight,
+            fontFamily: fonts.body,
           }}
         >
           ⚙️ Edit Profile

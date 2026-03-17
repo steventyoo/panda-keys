@@ -37,7 +37,7 @@ export function useFalAI() {
     animalName: string,
     letter: string,
     apiKey: string,
-    action?: string, // e.g., "roaring", "sleeping", "waving"
+    action?: string,
   ): Promise<GeneratedImage | null> => {
     // Check cache first
     const cacheKey = `${letter}-${action || 'default'}`;
@@ -50,7 +50,7 @@ export function useFalAI() {
     setError(null);
 
     const actionDesc = action ? `, ${action}` : '';
-    const prompt = `kawaii chibi ${animalName}${actionDesc}, cute round body, big sparkly eyes, pastel colors, simple flat design, white background, sticker style, adorable, no text, high quality illustration`;
+    const prompt = `ultra cute kawaii ${animalName}${actionDesc}, pastel color palette, soft rounded shapes, chibi style, big glossy eyes, tiny mouth, blush cheeks, minimal clean design, smooth vector illustration, soft shading, centered character, white or light pastel background, sanrio style, duolingo mascot style, high quality, simple, no text`;
 
     try {
       const response = await fetch(FAL_API_URL, {
@@ -117,12 +117,12 @@ export function useFalAI() {
   const kawaiiifyPhoto = useCallback(async (
     photoDataUrl: string,
     apiKey: string,
-    description?: string, // e.g., "brown dog", "tabby cat"
+    description?: string, // e.g., "brown dog", "little girl", "grandma"
   ): Promise<string | null> => {
     setGenerating(true);
     setError(null);
 
-    const prompt = `kawaii chibi version of a ${description || 'person'}, cute round body, big sparkly eyes, pastel colors, simple flat design, white background, sticker style, adorable, no text`;
+    const prompt = `ultra cute kawaii chibi version of a ${description || 'person'}, pastel color palette, soft rounded shapes, chibi style, big glossy eyes, tiny mouth, blush cheeks, minimal clean design, smooth vector illustration, soft shading, centered character, white or light pastel background, sanrio style, duolingo mascot style, high quality, simple, no text`;
 
     try {
       // Use img2img endpoint for photo-based generation

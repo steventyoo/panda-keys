@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { KawaiiAnimal } from '../data/animals';
+import { colors, fonts, radius } from '../styles/theme';
 
-// Check if there's AI-generated art cached for this animal
 function getGeneratedArt(letter: string): string | null {
   try {
     const cache = JSON.parse(localStorage.getItem('panda-keys-art-cache') || '{}');
-    return cache[letter] || null;
+    // Cache keys may be "A" or "A-default" format
+    return cache[letter] || cache[`${letter}-default`] || null;
   } catch { return null; }
 }
 
@@ -84,7 +85,7 @@ const entranceVariants: Record<string, { initial: any; animate: any; exit: any }
 const sizeMap = {
   small: { emoji: '3rem', container: '80px', name: '0.7rem', letter: '0.6rem' },
   medium: { emoji: '5rem', container: '120px', name: '0.9rem', letter: '0.75rem' },
-  large: { emoji: '7rem', container: '160px', name: '1.1rem', letter: '0.9rem' },
+  large: { emoji: '7rem', container: 'min(160px, 40vw)', name: '1.1rem', letter: '0.9rem' },
 };
 
 export default function KawaiiAnimalDisplay({ animal, id, onComplete, size = 'medium', persistent = false }: Props) {
@@ -118,32 +119,25 @@ export default function KawaiiAnimalDisplay({ animal, id, onComplete, size = 'me
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
       >
-        {/* Kawaii card */}
         <motion.div
           style={{
             width: s.container,
             height: s.container,
-            borderRadius: '24px',
+            borderRadius: radius.lg,
             background: generatedArt
-              ? `url(${generatedArt}) center/contain no-repeat, linear-gradient(135deg, ${animal.bgColor}, ${animal.color}40)`
-              : `linear-gradient(135deg, ${animal.bgColor}, ${animal.color}40)`,
+              ? `url(${generatedArt}) center/contain no-repeat, linear-gradient(135deg, ${animal.bgColor}, ${colors.cream})`
+              : `linear-gradient(135deg, ${animal.bgColor}, ${colors.cream})`,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: `0 4px 20px ${animal.color}60`,
-            border: `3px solid ${animal.color}`,
+            boxShadow: `0 4px 20px ${colors.shadow}`,
+            border: `2.5px solid ${animal.color}50`,
             position: 'relative',
             overflow: 'hidden',
           }}
-          animate={{
-            y: [0, -5, 0],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
+          animate={{ y: [0, -5, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
           {/* Sparkle effect */}
           <motion.div
@@ -159,7 +153,6 @@ export default function KawaiiAnimalDisplay({ animal, id, onComplete, size = 'me
             ✨
           </motion.div>
 
-          {/* Animal emoji (hidden if generated art exists) */}
           {!generatedArt && (
             <span style={{ fontSize: s.emoji, lineHeight: 1 }}>
               {animal.emoji}
@@ -172,28 +165,27 @@ export default function KawaiiAnimalDisplay({ animal, id, onComplete, size = 'me
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          style={{
-            marginTop: '8px',
-            textAlign: 'center',
-          }}
+          style={{ marginTop: '8px', textAlign: 'center' }}
         >
           <div style={{
             fontSize: s.name,
             fontWeight: 700,
-            color: '#5D4037',
-            textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+            color: colors.textDark,
+            textShadow: '0 1px 2px rgba(0,0,0,0.05)',
+            fontFamily: fonts.heading,
           }}>
             {animal.name}
           </div>
           <div style={{
             fontSize: s.letter,
-            fontWeight: 800,
+            fontWeight: 700,
             color: animal.color,
-            background: '#fff',
-            borderRadius: '8px',
+            background: colors.cream,
+            borderRadius: radius.sm,
             padding: '1px 8px',
             marginTop: '2px',
-            border: `2px solid ${animal.color}`,
+            border: `2px solid ${animal.color}50`,
+            fontFamily: fonts.fun,
           }}>
             {animal.letter}
           </div>

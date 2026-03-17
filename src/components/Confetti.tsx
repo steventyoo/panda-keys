@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
+import { colors } from '../styles/theme';
 
-const COLORS = ['#FF6B9D', '#C084FC', '#60A5FA', '#34D399', '#FBBF24', '#FB923C', '#F472B6'];
+const COLORS = [colors.pink, colors.lavender, colors.sky, colors.mint, colors.peach, colors.butter, colors.pinkDeep];
 
 interface Props {
   count?: number;

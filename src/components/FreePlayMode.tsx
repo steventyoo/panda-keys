@@ -7,6 +7,7 @@ import Keyboard from './Keyboard';
 import Confetti from './Confetti';
 import { useSound } from '../hooks/useSound';
 import { useGame } from '../context/GameContext';
+import { colors, fonts, radius, kawaiiCard } from '../styles/theme';
 
 interface ActiveAnimal {
   id: string;
@@ -32,7 +33,6 @@ export default function FreePlayMode() {
     dispatch({ type: 'KEY_PRESSED' });
     dispatch({ type: 'COLLECT_ANIMAL', letter: key });
 
-    // Play entrance sound
     switch (animal.entrance) {
       case 'bounce': play('bounce'); break;
       case 'float': play('whoosh'); break;
@@ -42,10 +42,8 @@ export default function FreePlayMode() {
       case 'slide': play('whoosh'); break;
     }
 
-    // Play animal sound slightly after
     setTimeout(() => playAnimalSound(animal.sound), 200);
 
-    // Position randomly but within visible area (above keyboard)
     const x = 5 + Math.random() * 75;
     const y = 8 + Math.random() * 40;
 
@@ -53,12 +51,10 @@ export default function FreePlayMode() {
     setActiveAnimals(prev => [...prev, { id, animal, x, y }]);
     setLastLetter(key);
 
-    // Remove after animation
     setTimeout(() => {
       setActiveAnimals(prev => prev.filter(a => a.id !== id));
     }, 4000);
 
-    // Confetti every 5 presses
     if ((state.totalKeysPressed + 1) % 5 === 0) {
       setShowConfetti(true);
       play('celebrate');
@@ -82,7 +78,7 @@ export default function FreePlayMode() {
     }}>
       {/* Header */}
       <div style={{
-        padding: '12px 20px',
+        padding: '12px 16px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -92,27 +88,27 @@ export default function FreePlayMode() {
           whileTap={{ scale: 0.9 }}
           onClick={() => dispatch({ type: 'SET_MODE', mode: 'menu' })}
           style={{
-            background: '#fff',
-            border: '3px solid #F8BBD0',
-            borderRadius: '16px',
+            ...kawaiiCard(colors.pink),
             padding: '8px 16px',
             fontSize: '1rem',
             cursor: 'pointer',
             fontWeight: 700,
-            color: '#E91E63',
+            color: colors.pinkDeep,
+            fontFamily: fonts.heading,
+            border: `2.5px solid ${colors.pink}60`,
           }}
         >
           ← Back
         </motion.button>
 
         <div style={{
-          background: '#fff',
-          borderRadius: '16px',
-          padding: '8px 20px',
-          border: '3px solid #CE93D8',
+          ...kawaiiCard(colors.lavender),
+          padding: '8px 16px',
           fontWeight: 700,
-          color: '#7B1FA2',
-          fontSize: '0.9rem',
+          color: colors.textAccent,
+          fontSize: 'clamp(0.7rem, 2.5vw, 0.9rem)',
+          fontFamily: fonts.heading,
+          border: `2.5px solid ${colors.lavender}40`,
         }}>
           🐼 Keys: {state.totalKeysPressed} | 🐾 Critters: {state.collectedAnimals.length}/26
         </div>
@@ -131,24 +127,25 @@ export default function FreePlayMode() {
               left: '50%',
               transform: 'translate(-50%, -50%)',
               textAlign: 'center',
+              width: '90%',
+              maxWidth: '400px',
             }}
           >
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
               style={{
-                fontSize: '1.8rem',
-                fontWeight: 800,
-                color: '#7B1FA2',
-                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                background: '#ffffffcc',
-                borderRadius: '24px',
-                padding: '20px 40px',
-                border: '3px dashed #CE93D8',
+                fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
+                fontWeight: 700,
+                color: colors.textAccent,
+                ...kawaiiCard(colors.lavender),
+                padding: '20px 30px',
+                border: `2.5px dashed ${colors.lavender}`,
+                fontFamily: fonts.heading,
               }}
             >
               🐼 Press any key or tap the keyboard! 🐼
-              <div style={{ fontSize: '1rem', marginTop: '8px', color: '#9C27B0' }}>
+              <div style={{ fontSize: 'clamp(0.8rem, 3vw, 1rem)', marginTop: '8px', color: colors.textMedium, fontFamily: fonts.body }}>
                 {state.playerName ? `Go ahead, ${state.playerName}!` : 'Each key has a surprise!'}
               </div>
             </motion.div>
@@ -195,9 +192,10 @@ export default function FreePlayMode() {
               transform: 'translate(-50%, -50%)',
               fontSize: '5rem',
               fontWeight: 900,
-              color: '#CE93D880',
+              color: `${colors.lavender}80`,
               pointerEvents: 'none',
               zIndex: 5,
+              fontFamily: fonts.fun,
             }}
           >
             {lastLetter}
@@ -205,7 +203,6 @@ export default function FreePlayMode() {
         )}
       </AnimatePresence>
 
-      {/* Visual QWERTY Keyboard */}
       <Keyboard collectedAnimals={state.collectedAnimals} />
 
       {showConfetti && <Confetti />}
