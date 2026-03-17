@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useFalAI } from '../hooks/useFalAI';
 import { useGame } from '../context/GameContext';
-import { colors, gradients, fonts, radius, kawaiiButton, kawaiiCard } from '../styles/theme';
+import { colors, fonts, radius, kawaiiButton, kawaiiCard, gradients } from '../styles/theme';
 
 interface CreatedImage {
   url: string;
@@ -12,22 +12,14 @@ interface CreatedImage {
 export default function ArtGenerator() {
   const { dispatch } = useGame();
   const { generateFreeform, generating, error } = useFalAI();
-  const [apiKey, setApiKey] = useState(localStorage.getItem('fal-api-key') || '');
-  const [showApiInput, setShowApiInput] = useState(!apiKey);
   const [prompt, setPrompt] = useState('');
-  const [images, setImages] = useState<CreatedImage[]>([]);
-
-  const handleSaveKey = () => {
-    localStorage.setItem('fal-api-key', apiKey);
-    setShowApiInput(false);
-  };
+  const [image, setImage] = useState<CreatedImage | null>(null);
 
   const handleGenerate = async () => {
-    if (!apiKey || !prompt.trim() || generating) return;
-    localStorage.setItem('fal-api-key', apiKey);
-    const url = await generateFreeform(prompt.trim(), apiKey);
+    if (!prompt.trim() || generating) return;
+    const url = await generateFreeform(prompt.trim());
     if (url) {
-      setImages(prev => [{ url, prompt: prompt.trim() }, ...prev]);
+      setImage({ url, prompt: prompt.trim() });
       setPrompt('');
     }
   };
@@ -81,57 +73,7 @@ export default function ArtGenerator() {
       </div>
 
       {/* Main content */}
-      <div style={{
-        maxWidth: '600px',
-        margin: '0 auto',
-      }}>
-        {/* API Key section (collapsed when saved) */}
-        {(showApiInput || !apiKey) && (
-          <div style={{
-            ...kawaiiCard(colors.lavender),
-            padding: '16px',
-            border: `2.5px solid ${colors.lavender}40`,
-            marginBottom: '16px',
-          }}>
-            <p style={{ color: colors.textMedium, fontSize: '0.85rem', margin: '0 0 10px', fontFamily: fonts.body }}>
-              Enter your fal.ai API key to create art
-            </p>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <input
-                type="password"
-                value={apiKey}
-                onChange={e => setApiKey(e.target.value)}
-                placeholder="fal.ai API key..."
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: radius.sm,
-                  border: `2px solid ${colors.lavender}`,
-                  outline: 'none',
-                  fontSize: '0.9rem',
-                  color: colors.textAccent,
-                  background: colors.cream,
-                  fontFamily: fonts.body,
-                }}
-              />
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleSaveKey}
-                disabled={!apiKey}
-                style={{
-                  ...kawaiiButton(colors.lavender, apiKey ? gradients.primary : `${colors.lavender}40`),
-                  padding: '10px 20px',
-                  fontSize: '0.9rem',
-                  cursor: apiKey ? 'pointer' : 'default',
-                }}
-              >
-                Save
-              </motion.button>
-            </div>
-          </div>
-        )}
-
+      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
         {/* Prompt input */}
         <div style={{
           ...kawaiiCard(colors.butter),
@@ -179,17 +121,17 @@ export default function ArtGenerator() {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={handleGenerate}
-            disabled={generating || !prompt.trim() || !apiKey}
+            disabled={generating || !prompt.trim()}
             style={{
               marginTop: '12px',
               width: '100%',
               ...kawaiiButton(
                 colors.pink,
-                generating || !prompt.trim() || !apiKey ? `${colors.lavender}40` : gradients.primary,
+                generating || !prompt.trim() ? `${colors.lavender}40` : gradients.primary,
               ),
               padding: '14px',
               fontSize: 'clamp(1rem, 3.5vw, 1.2rem)',
-              cursor: generating || !prompt.trim() || !apiKey ? 'default' : 'pointer',
+              cursor: generating || !prompt.trim() ? 'default' : 'pointer',
             }}
           >
             {generating ? '✨ Creating...' : '✨ Create!'}
@@ -208,43 +150,12 @@ export default function ArtGenerator() {
               {error}
             </div>
           )}
-
-          {!apiKey && (
-            <p style={{
-              margin: '8px 0 0',
-              fontSize: '0.8rem',
-              color: colors.textLight,
-              textAlign: 'center',
-              fontFamily: fonts.body,
-            }}>
-              Add your fal.ai API key above to start creating
-            </p>
-          )}
-
-          {apiKey && !showApiInput && (
-            <button
-              onClick={() => setShowApiInput(true)}
-              style={{
-                display: 'block',
-                margin: '8px auto 0',
-                background: 'none',
-                border: 'none',
-                color: colors.textLight,
-                cursor: 'pointer',
-                fontSize: '0.75rem',
-                textDecoration: 'underline',
-                fontFamily: fonts.body,
-              }}
-            >
-              Change API key
-            </button>
-          )}
         </div>
 
         {/* Generated image — big display */}
-        {images.length > 0 && (
+        {image && (
           <motion.div
-            key={images[0].url}
+            key={image.url}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, ease: 'backOut' }}
@@ -256,8 +167,8 @@ export default function ArtGenerator() {
             }}
           >
             <img
-              src={images[0].url}
-              alt={images[0].prompt}
+              src={image.url}
+              alt={image.prompt}
               style={{
                 width: '100%',
                 maxWidth: '500px',
@@ -273,7 +184,7 @@ export default function ArtGenerator() {
               fontFamily: fonts.body,
               lineHeight: 1.4,
             }}>
-              {images[0].prompt}
+              {image.prompt}
             </p>
           </motion.div>
         )}

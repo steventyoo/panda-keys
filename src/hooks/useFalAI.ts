@@ -1,9 +1,8 @@
 import { useState, useCallback } from 'react';
 
-// fal.ai integration for generating kawaii animal images
-// Uses the fal.ai REST API directly (no server needed for client-side usage)
-
+// fal.ai integration for generating kawaii images
 const FAL_API_URL = 'https://fal.run/fal-ai/flux/schnell';
+const FAL_API_KEY = 'a809ad1a-229b-40bf-a93d-890ab66d57eb:abed9695a2a80db885282bef1bc3186a';
 
 interface GeneratedImage {
   url: string;
@@ -36,10 +35,8 @@ export function useFalAI() {
   const generateKawaiiAnimal = useCallback(async (
     animalName: string,
     letter: string,
-    apiKey: string,
     action?: string,
   ): Promise<GeneratedImage | null> => {
-    // Check cache first
     const cacheKey = `${letter}-${action || 'default'}`;
     const cached = getCachedImage(cacheKey);
     if (cached) {
@@ -56,7 +53,7 @@ export function useFalAI() {
       const response = await fetch(FAL_API_URL, {
         method: 'POST',
         headers: {
-          'Authorization': `Key ${apiKey}`,
+          'Authorization': `Key ${FAL_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -79,10 +76,8 @@ export function useFalAI() {
         throw new Error('No image returned');
       }
 
-      // Cache the result
       setCachedImage(cacheKey, imageUrl);
       setGenerating(false);
-
       return { url: imageUrl, letter, animalName };
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Generation failed');
@@ -93,7 +88,6 @@ export function useFalAI() {
 
   const generateAllAnimals = useCallback(async (
     animals: Array<{ name: string; letter: string }>,
-    apiKey: string,
     onProgress?: (completed: number, total: number) => void,
   ) => {
     const results: GeneratedImage[] = [];
@@ -101,10 +95,9 @@ export function useFalAI() {
 
     for (let i = 0; i < animals.length; i++) {
       const { name, letter } = animals[i];
-      const result = await generateKawaiiAnimal(name, letter, apiKey);
+      const result = await generateKawaiiAnimal(name, letter);
       if (result) results.push(result);
       onProgress?.(i + 1, total);
-      // Small delay to avoid rate limiting
       if (i < animals.length - 1) {
         await new Promise(r => setTimeout(r, 500));
       }
@@ -116,8 +109,7 @@ export function useFalAI() {
   // Generate a kawaii version of an uploaded photo
   const kawaiiifyPhoto = useCallback(async (
     photoDataUrl: string,
-    apiKey: string,
-    description?: string, // e.g., "brown dog", "little girl", "grandma"
+    description?: string,
   ): Promise<string | null> => {
     setGenerating(true);
     setError(null);
@@ -125,11 +117,10 @@ export function useFalAI() {
     const prompt = `ultra cute kawaii chibi version of a ${description || 'person'}, pastel color palette, soft rounded shapes, chibi style, big glossy eyes, tiny mouth, blush cheeks, minimal clean design, smooth vector illustration, soft shading, centered character, white or light pastel background, sanrio style, duolingo mascot style, high quality, simple, no text`;
 
     try {
-      // Use img2img endpoint for photo-based generation
       const response = await fetch('https://fal.run/fal-ai/flux/dev/image-to-image', {
         method: 'POST',
         headers: {
-          'Authorization': `Key ${apiKey}`,
+          'Authorization': `Key ${FAL_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -160,7 +151,6 @@ export function useFalAI() {
   // Generate any freeform kawaii image from a text description
   const generateFreeform = useCallback(async (
     description: string,
-    apiKey: string,
   ): Promise<string | null> => {
     setGenerating(true);
     setError(null);
@@ -171,7 +161,7 @@ export function useFalAI() {
       const response = await fetch(FAL_API_URL, {
         method: 'POST',
         headers: {
-          'Authorization': `Key ${apiKey}`,
+          'Authorization': `Key ${FAL_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

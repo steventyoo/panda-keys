@@ -144,18 +144,15 @@ function NameStep({ onNext }: { onNext: () => void }) {
       const dataUrl = ev.target?.result as string;
       setOriginalPhoto(dataUrl);
 
-      // Try to kawaiiify with fal.ai
-      const apiKey = localStorage.getItem('fal-api-key');
-      if (apiKey) {
-        setKawaiiifying(true);
-        const kawaiiUrl = await kawaiiifyPhoto(dataUrl, apiKey, 'child');
-        setKawaiiifying(false);
-        if (kawaiiUrl) {
-          dispatch({ type: 'SET_PLAYER_PHOTO', photoUrl: kawaiiUrl });
-          return;
-        }
+      // Kawaiiify with fal.ai
+      setKawaiiifying(true);
+      const kawaiiUrl = await kawaiiifyPhoto(dataUrl, 'child');
+      setKawaiiifying(false);
+      if (kawaiiUrl) {
+        dispatch({ type: 'SET_PLAYER_PHOTO', photoUrl: kawaiiUrl });
+        return;
       }
-      // Fallback: use original photo if no API key or generation failed
+      // Fallback: use original photo if generation failed
       dispatch({ type: 'SET_PLAYER_PHOTO', photoUrl: dataUrl });
     };
     reader.readAsDataURL(file);
