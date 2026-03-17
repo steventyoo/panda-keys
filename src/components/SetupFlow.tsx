@@ -45,11 +45,7 @@ const EYE_STYLES = ['round', 'sparkle', 'sleepy', 'happy'] as const;
 function FloatingKawaii() {
   const critters = [
     { top: '5%', left: '5%', delay: 0, size: 50, letter: 'P' },
-    { top: '8%', right: '8%', delay: 0.5, size: 40, letter: 'B' },
-    { top: '75%', left: '3%', delay: 1, size: 45, letter: 'C' },
-    { top: '70%', right: '5%', delay: 1.5, size: 36, letter: 'D' },
-    { top: '40%', left: '2%', delay: 0.8, size: 32, letter: 'K' },
-    { top: '35%', right: '3%', delay: 1.2, size: 34, letter: 'H' },
+    { top: '70%', right: '5%', delay: 1.5, size: 36, letter: 'P' },
   ];
 
   return (
@@ -93,13 +89,13 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
       </motion.div>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
-        {['B', 'C', 'D'].map((letter, i) => (
+        {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
           >
-            <KawaiiImg letter={letter} fallback="🐼" size={44} />
+            <KawaiiImg letter="P" fallback="🐼" size={44} />
           </motion.div>
         ))}
       </div>
@@ -375,13 +371,13 @@ function FamilyStep() {
       style={{ textAlign: 'center', maxWidth: '600px', width: '100%', padding: '0 16px' }}
     >
       <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '12px', alignItems: 'flex-end' }}>
-        {['E', 'P', 'L', 'B'].map((letter, i) => (
+        {[0, 1, 2, 3].map((i) => (
           <motion.div
             key={i}
             animate={{ y: [0, -8, 0], rotate: [-3, 3, -3] }}
             transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }}
           >
-            <KawaiiImg letter={letter} fallback="🐼" size={i === 0 || i === 1 ? 50 : 38} />
+            <KawaiiImg letter="P" fallback="🐼" size={i === 0 || i === 1 ? 50 : 38} />
           </motion.div>
         ))}
       </div>
