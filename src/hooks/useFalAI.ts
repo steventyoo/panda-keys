@@ -157,10 +157,57 @@ export function useFalAI() {
     }
   }, []);
 
+  // Generate any freeform kawaii image from a text description
+  const generateFreeform = useCallback(async (
+    description: string,
+    apiKey: string,
+  ): Promise<string | null> => {
+    setGenerating(true);
+    setError(null);
+
+    const prompt = `ultra cute kawaii ${description}, pastel color palette, soft rounded shapes, chibi style, big glossy eyes, tiny mouth, blush cheeks, minimal clean design, smooth vector illustration, soft shading, white or light pastel background, sanrio style, duolingo mascot style, high quality, simple, no text`;
+
+    try {
+      const response = await fetch(FAL_API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Key ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          image_size: 'square',
+          num_images: 1,
+          num_inference_steps: 4,
+          enable_safety_checker: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`fal.ai error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const imageUrl = data.images?.[0]?.url;
+      setGenerating(false);
+
+      if (!imageUrl) {
+        throw new Error('No image returned');
+      }
+
+      return imageUrl;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Generation failed');
+      setGenerating(false);
+      return null;
+    }
+  }, []);
+
   return {
     generateKawaiiAnimal,
     generateAllAnimals,
     kawaiiifyPhoto,
+    generateFreeform,
     generating,
     error,
   };

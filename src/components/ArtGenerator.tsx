@@ -1,57 +1,34 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { animals } from '../data/animals';
 import { useFalAI } from '../hooks/useFalAI';
 import { useGame } from '../context/GameContext';
 import { colors, gradients, fonts, radius, kawaiiButton, kawaiiCard } from '../styles/theme';
 
+interface CreatedImage {
+  url: string;
+  prompt: string;
+}
+
 export default function ArtGenerator() {
-  const { state, dispatch } = useGame();
-  const { generateKawaiiAnimal, generateAllAnimals, generating, error } = useFalAI();
+  const { dispatch } = useGame();
+  const { generateFreeform, generating, error } = useFalAI();
   const [apiKey, setApiKey] = useState(localStorage.getItem('fal-api-key') || '');
-  const [progress, setProgress] = useState({ done: 0, total: 0 });
-  const [generatedImages, setGeneratedImages] = useState<Record<string, string>>(() => {
-    try {
-      const raw = JSON.parse(localStorage.getItem('panda-keys-art-cache') || '{}');
-      // Normalize keys: "A-default" -> "A" for display lookup
-      const normalized: Record<string, string> = {};
-      for (const [key, val] of Object.entries(raw)) {
-        const letter = key.replace('-default', '');
-        normalized[letter] = val as string;
-      }
-      return normalized;
-    } catch { return {}; }
-  });
   const [showApiInput, setShowApiInput] = useState(!apiKey);
+  const [prompt, setPrompt] = useState('');
+  const [images, setImages] = useState<CreatedImage[]>([]);
 
   const handleSaveKey = () => {
     localStorage.setItem('fal-api-key', apiKey);
     setShowApiInput(false);
   };
 
-  const handleGenerateAll = async () => {
-    if (!apiKey) return;
+  const handleGenerate = async () => {
+    if (!apiKey || !prompt.trim() || generating) return;
     localStorage.setItem('fal-api-key', apiKey);
-
-    const animalList = Object.values(animals).map(a => ({
-      name: a.name,
-      letter: a.letter,
-    }));
-
-    const results = await generateAllAnimals(animalList, apiKey, (done, total) => {
-      setProgress({ done, total });
-    });
-
-    const newImages: Record<string, string> = { ...generatedImages };
-    results.forEach(r => { newImages[r.letter] = r.url; });
-    setGeneratedImages(newImages);
-  };
-
-  const handleGenerateSingle = async (letter: string, name: string, action?: string) => {
-    if (!apiKey) return;
-    const result = await generateKawaiiAnimal(name, letter, apiKey, action);
-    if (result) {
-      setGeneratedImages(prev => ({ ...prev, [letter]: result.url }));
+    const url = await generateFreeform(prompt.trim(), apiKey);
+    if (url) {
+      setImages(prev => [{ url, prompt: prompt.trim() }, ...prev]);
+      setPrompt('');
     }
   };
 
@@ -103,190 +80,203 @@ export default function ArtGenerator() {
         </div>
       </div>
 
-      {/* API Key section */}
+      {/* Main content */}
       <div style={{
-        ...kawaiiCard(colors.lavender),
-        padding: '20px',
-        border: `2.5px solid ${colors.lavender}40`,
-        marginBottom: '20px',
         maxWidth: '600px',
-        margin: '0 auto 20px',
+        margin: '0 auto',
       }}>
-        <h3 style={{ color: colors.textAccent, margin: '0 0 12px', fontSize: '1.1rem', fontFamily: fonts.heading }}>
-          🤖 fal.ai - Generate Kawaii Art
-        </h3>
-        <p style={{ color: colors.textMedium, fontSize: '0.85rem', margin: '0 0 12px', fontFamily: fonts.body }}>
-          Generate unique kawaii animals with AI! Get a free API key at fal.ai
-        </p>
-
-        {showApiInput || !apiKey ? (
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={e => setApiKey(e.target.value)}
-              placeholder="Enter fal.ai API key..."
-              style={{
-                flex: 1,
-                padding: '10px 14px',
-                borderRadius: radius.sm,
-                border: `2px solid ${colors.lavender}`,
-                outline: 'none',
-                fontSize: '0.9rem',
-                color: colors.textAccent,
-                background: colors.cream,
-                fontFamily: fonts.body,
-              }}
-            />
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleSaveKey}
-              disabled={!apiKey}
-              style={{
-                ...kawaiiButton(colors.lavender, apiKey ? gradients.primary : `${colors.lavender}40`),
-                padding: '10px 20px',
-                fontSize: '0.9rem',
-                cursor: apiKey ? 'pointer' : 'default',
-              }}
-            >
-              Save
-            </motion.button>
+        {/* API Key section (collapsed when saved) */}
+        {(showApiInput || !apiKey) && (
+          <div style={{
+            ...kawaiiCard(colors.lavender),
+            padding: '16px',
+            border: `2.5px solid ${colors.lavender}40`,
+            marginBottom: '16px',
+          }}>
+            <p style={{ color: colors.textMedium, fontSize: '0.85rem', margin: '0 0 10px', fontFamily: fonts.body }}>
+              Enter your fal.ai API key to create art
+            </p>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="password"
+                value={apiKey}
+                onChange={e => setApiKey(e.target.value)}
+                placeholder="fal.ai API key..."
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: radius.sm,
+                  border: `2px solid ${colors.lavender}`,
+                  outline: 'none',
+                  fontSize: '0.9rem',
+                  color: colors.textAccent,
+                  background: colors.cream,
+                  fontFamily: fonts.body,
+                }}
+              />
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleSaveKey}
+                disabled={!apiKey}
+                style={{
+                  ...kawaiiButton(colors.lavender, apiKey ? gradients.primary : `${colors.lavender}40`),
+                  padding: '10px 20px',
+                  fontSize: '0.9rem',
+                  cursor: apiKey ? 'pointer' : 'default',
+                }}
+              >
+                Save
+              </motion.button>
+            </div>
           </div>
-        ) : (
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span style={{ color: colors.mintDeep, fontWeight: 700, fontSize: '0.9rem', fontFamily: fonts.body }}>
-              ✓ API key saved
-            </span>
+        )}
+
+        {/* Prompt input */}
+        <div style={{
+          ...kawaiiCard(colors.butter),
+          padding: '20px',
+          border: `2.5px solid ${colors.butter}60`,
+          marginBottom: '20px',
+        }}>
+          <h2 style={{
+            margin: '0 0 12px',
+            fontSize: 'clamp(1.1rem, 4vw, 1.4rem)',
+            color: colors.textAccent,
+            fontFamily: fonts.fun,
+            textAlign: 'center',
+          }}>
+            What do you want to draw?
+          </h2>
+
+          <textarea
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            placeholder="A princess riding a dragon above a castle..."
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleGenerate();
+              }
+            }}
+            style={{
+              width: '100%',
+              minHeight: '80px',
+              padding: '14px',
+              borderRadius: radius.md,
+              border: `2.5px solid ${colors.lavender}50`,
+              outline: 'none',
+              fontSize: 'clamp(0.95rem, 3vw, 1.1rem)',
+              color: colors.textDark,
+              background: colors.cream,
+              fontFamily: fonts.body,
+              resize: 'vertical',
+              boxSizing: 'border-box',
+            }}
+          />
+
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleGenerate}
+            disabled={generating || !prompt.trim() || !apiKey}
+            style={{
+              marginTop: '12px',
+              width: '100%',
+              ...kawaiiButton(
+                colors.pink,
+                generating || !prompt.trim() || !apiKey ? `${colors.lavender}40` : gradients.primary,
+              ),
+              padding: '14px',
+              fontSize: 'clamp(1rem, 3.5vw, 1.2rem)',
+              cursor: generating || !prompt.trim() || !apiKey ? 'default' : 'pointer',
+            }}
+          >
+            {generating ? '✨ Creating...' : '✨ Create!'}
+          </motion.button>
+
+          {error && (
+            <div style={{
+              marginTop: '8px',
+              color: colors.pinkDeep,
+              fontSize: '0.85rem',
+              background: `${colors.pink}30`,
+              borderRadius: radius.sm,
+              padding: '8px 12px',
+              fontFamily: fonts.body,
+            }}>
+              {error}
+            </div>
+          )}
+
+          {!apiKey && (
+            <p style={{
+              margin: '8px 0 0',
+              fontSize: '0.8rem',
+              color: colors.textLight,
+              textAlign: 'center',
+              fontFamily: fonts.body,
+            }}>
+              Add your fal.ai API key above to start creating
+            </p>
+          )}
+
+          {apiKey && !showApiInput && (
             <button
               onClick={() => setShowApiInput(true)}
               style={{
+                display: 'block',
+                margin: '8px auto 0',
                 background: 'none',
                 border: 'none',
-                color: colors.textAccent,
+                color: colors.textLight,
                 cursor: 'pointer',
-                fontSize: '0.8rem',
+                fontSize: '0.75rem',
                 textDecoration: 'underline',
                 fontFamily: fonts.body,
               }}
             >
-              Change
+              Change API key
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
-        {apiKey && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleGenerateAll}
-            disabled={generating}
+        {/* Generated image — big display */}
+        {images.length > 0 && (
+          <motion.div
+            key={images[0].url}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, ease: 'backOut' }}
             style={{
-              marginTop: '16px',
-              width: '100%',
-              ...kawaiiButton(colors.lavender, generating ? `${colors.lavender}40` : gradients.primary),
-              padding: '14px',
-              fontSize: '1.1rem',
-              cursor: generating ? 'default' : 'pointer',
+              ...kawaiiCard(colors.lavender),
+              padding: '16px',
+              border: `2.5px solid ${colors.lavender}30`,
+              textAlign: 'center',
             }}
           >
-            {generating
-              ? `Generating... ${progress.done}/${progress.total} 🎨`
-              : '✨ Generate All 26 Kawaii Animals ✨'}
-          </motion.button>
-        )}
-
-        {error && (
-          <div style={{
-            marginTop: '8px',
-            color: colors.pinkDeep,
-            fontSize: '0.85rem',
-            background: `${colors.pink}30`,
-            borderRadius: radius.sm,
-            padding: '8px 12px',
-            fontFamily: fonts.body,
-          }}>
-            {error}
-          </div>
-        )}
-      </div>
-
-      {/* Animal grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(min(120px, 28vw), 1fr))',
-        gap: '12px',
-        maxWidth: '800px',
-        margin: '0 auto',
-      }}>
-        {Object.values(animals).map(animal => {
-          const hasGenerated = generatedImages[animal.letter];
-
-          return (
-            <motion.div
-              key={animal.letter}
-              whileHover={{ scale: 1.05, y: -3 }}
+            <img
+              src={images[0].url}
+              alt={images[0].prompt}
               style={{
-                ...kawaiiCard(hasGenerated ? animal.color : colors.lavender),
-                padding: '12px',
-                border: `2px solid ${hasGenerated ? animal.color + '50' : colors.lavender + '30'}`,
-                textAlign: 'center',
-                cursor: apiKey ? 'pointer' : 'default',
+                width: '100%',
+                maxWidth: '500px',
+                aspectRatio: '1',
+                objectFit: 'contain',
+                borderRadius: radius.md,
               }}
-              onClick={() => {
-                if (apiKey && !generating) {
-                  handleGenerateSingle(animal.letter, animal.name);
-                }
-              }}
-            >
-              {hasGenerated ? (
-                <img
-                  src={hasGenerated}
-                  alt={animal.name}
-                  style={{
-                    width: '80px',
-                    height: '80px',
-                    objectFit: 'contain',
-                    borderRadius: radius.sm,
-                    mixBlendMode: 'multiply' as const,
-                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
-                  }}
-                />
-              ) : (
-                <div style={{
-                  width: '80px',
-                  height: '80px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '3rem',
-                  margin: '0 auto',
-                }}>
-                  {animal.emoji}
-                </div>
-              )}
-              <div style={{
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                color: colors.textDark,
-                marginTop: '4px',
-                fontFamily: fonts.heading,
-              }}>
-                {animal.letter} - {animal.name}
-              </div>
-              {!hasGenerated && apiKey && (
-                <div style={{
-                  fontSize: '0.65rem',
-                  color: colors.textAccent,
-                  marginTop: '2px',
-                  fontFamily: fonts.body,
-                }}>
-                  Click to generate
-                </div>
-              )}
-            </motion.div>
-          );
-        })}
+            />
+            <p style={{
+              margin: '10px 0 0',
+              fontSize: 'clamp(0.85rem, 3vw, 1rem)',
+              color: colors.textMedium,
+              fontFamily: fonts.body,
+              lineHeight: 1.4,
+            }}>
+              {images[0].prompt}
+            </p>
+          </motion.div>
+        )}
       </div>
     </div>
   );

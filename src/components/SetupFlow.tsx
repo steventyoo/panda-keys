@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '../context/GameContext';
 import type { FamilyMember } from '../context/GameContext';
 import { useSound } from '../hooks/useSound';
+import { useFalAI } from '../hooks/useFalAI';
 import { colors, gradients, fonts, radius, kawaiiButton, kawaiiCard } from '../styles/theme';
 
 // Get kawaii art from fal.ai cache
@@ -131,13 +132,31 @@ function NameStep({ onNext }: { onNext: () => void }) {
   const { state, dispatch } = useGame();
   const [name, setName] = useState(state.playerName);
   const [age, setAge] = useState(state.playerAge);
+  const [originalPhoto, setOriginalPhoto] = useState<string | null>(null);
+  const [kawaiiifying, setKawaiiifying] = useState(false);
+  const { kawaiiifyPhoto } = useFalAI();
 
-  const handlePlayerPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePlayerPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      dispatch({ type: 'SET_PLAYER_PHOTO', photoUrl: ev.target?.result as string });
+    reader.onload = async (ev) => {
+      const dataUrl = ev.target?.result as string;
+      setOriginalPhoto(dataUrl);
+
+      // Try to kawaiiify with fal.ai
+      const apiKey = localStorage.getItem('fal-api-key');
+      if (apiKey) {
+        setKawaiiifying(true);
+        const kawaiiUrl = await kawaiiifyPhoto(dataUrl, apiKey, 'child');
+        setKawaiiifying(false);
+        if (kawaiiUrl) {
+          dispatch({ type: 'SET_PLAYER_PHOTO', photoUrl: kawaiiUrl });
+          return;
+        }
+      }
+      // Fallback: use original photo if no API key or generation failed
+      dispatch({ type: 'SET_PLAYER_PHOTO', photoUrl: dataUrl });
     };
     reader.readAsDataURL(file);
   };
@@ -250,17 +269,19 @@ function NameStep({ onNext }: { onNext: () => void }) {
           Upload your photo (we'll make you kawaii!)
         </label>
         <div style={{ marginTop: '8px' }}>
-          {state.playerPhotoUrl ? (
+          {state.playerPhotoUrl || kawaiiifying ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-              <div style={{
-                width: '70px',
-                height: '70px',
-                borderRadius: '50%',
-                overflow: 'hidden',
-                border: `3px solid ${colors.lavender}`,
-              }}>
-                <img src={state.playerPhotoUrl} alt="You" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
+              {originalPhoto && (
+                <div style={{
+                  width: '70px',
+                  height: '70px',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  border: `3px solid ${colors.lavender}`,
+                }}>
+                  <img src={originalPhoto} alt="You" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              )}
               <motion.span
                 animate={{ x: [0, 5, 0] }}
                 transition={{ duration: 1, repeat: Infinity }}
@@ -268,24 +289,38 @@ function NameStep({ onNext }: { onNext: () => void }) {
               >
                 →
               </motion.span>
-              <motion.div
-                animate={{ rotate: [-5, 5, -5] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                style={{
+              {kawaiiifying ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  style={{
+                    width: '70px',
+                    height: '70px',
+                    borderRadius: '50%',
+                    background: `linear-gradient(135deg, ${colors.blush}, ${colors.cream})`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: `3px solid ${colors.lavender}`,
+                    fontSize: '1.5rem',
+                  }}
+                >
+                  ✨
+                </motion.div>
+              ) : state.playerPhotoUrl ? (
+                <div style={{
                   width: '70px',
                   height: '70px',
                   borderRadius: '50%',
-                  background: `linear-gradient(135deg, ${colors.blush}, ${colors.cream})`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  overflow: 'hidden',
                   border: `3px solid ${colors.lavender}`,
-                  fontSize: '2.5rem',
-                }}
-              >
-                🐼
-              </motion.div>
-              <span style={{ fontSize: '0.75rem', color: colors.textAccent, maxWidth: '80px', fontFamily: fonts.body }}>Your kawaii avatar!</span>
+                }}>
+                  <img src={state.playerPhotoUrl} alt="Kawaii you" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              ) : null}
+              <span style={{ fontSize: '0.75rem', color: colors.textAccent, maxWidth: '80px', fontFamily: fonts.body }}>
+                {kawaiiifying ? 'Making you kawaii...' : 'Your kawaii avatar!'}
+              </span>
             </div>
           ) : (
             <label style={{
