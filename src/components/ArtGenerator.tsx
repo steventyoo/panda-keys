@@ -248,6 +248,8 @@ export default function ArtGenerator() {
                     height: '80px',
                     objectFit: 'contain',
                     borderRadius: radius.sm,
+                    mixBlendMode: 'multiply' as const,
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
                   }}
                 />
               ) : (

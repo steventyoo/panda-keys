@@ -17,7 +17,7 @@ function getCachedArt(letter: string): string | null {
 function KawaiiImg({ letter, fallback, size = 60, style }: { letter: string; fallback: string; size?: number; style?: React.CSSProperties }) {
   const art = getCachedArt(letter);
   if (art) {
-    return <img src={art} alt={fallback} style={{ width: size, height: size, objectFit: 'contain', borderRadius: '50%', ...style }} />;
+    return <img src={art} alt={fallback} style={{ width: size, height: size, objectFit: 'contain', borderRadius: '50%', mixBlendMode: 'multiply' as const, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))', ...style }} />;
   }
   return <span style={{ fontSize: size * 0.6, ...style }}>{fallback}</span>;
 }

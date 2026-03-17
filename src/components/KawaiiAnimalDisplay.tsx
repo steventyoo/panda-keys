@@ -124,9 +124,7 @@ export default function KawaiiAnimalDisplay({ animal, id, onComplete, size = 'me
             width: s.container,
             height: s.container,
             borderRadius: radius.lg,
-            background: generatedArt
-              ? `url(${generatedArt}) center/contain no-repeat, linear-gradient(135deg, ${animal.bgColor}, ${colors.cream})`
-              : `linear-gradient(135deg, ${animal.bgColor}, ${colors.cream})`,
+            background: `linear-gradient(135deg, ${animal.bgColor}, ${colors.cream})`,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -153,7 +151,19 @@ export default function KawaiiAnimalDisplay({ animal, id, onComplete, size = 'me
             ✨
           </motion.div>
 
-          {!generatedArt && (
+          {generatedArt ? (
+            <img
+              src={generatedArt}
+              alt={animal.name}
+              style={{
+                width: '85%',
+                height: '85%',
+                objectFit: 'contain',
+                mixBlendMode: 'multiply' as const,
+                filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))',
+              }}
+            />
+          ) : (
             <span style={{ fontSize: s.emoji, lineHeight: 1 }}>
               {animal.emoji}
             </span>
