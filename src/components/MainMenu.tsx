@@ -23,6 +23,13 @@ export default function MainMenu() {
       bgColor: `${colors.mint}30`,
     },
     {
+      title: '📝 Spell It!',
+      subtitle: 'Learn to spell fun words!',
+      mode: 'spelling' as const,
+      color: colors.butter,
+      bgColor: `${colors.butter}40`,
+    },
+    {
       title: '🐾 My Critters',
       subtitle: `${state.collectedAnimals.length}/26 collected`,
       mode: 'collection' as const,

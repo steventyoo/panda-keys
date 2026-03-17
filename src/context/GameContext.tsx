@@ -21,7 +21,7 @@ export interface GameState {
   playerAvatar: string;
   playerPhotoUrl?: string;
   family: FamilyMember[];
-  mode: 'setup' | 'menu' | 'freeplay' | 'guided' | 'collection' | 'artgen';
+  mode: 'setup' | 'menu' | 'freeplay' | 'guided' | 'collection' | 'artgen' | 'spelling';
   collectedAnimals: string[];
   currentStreak: number;
   totalKeysPressed: number;
