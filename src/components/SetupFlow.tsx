@@ -5,6 +5,23 @@ import type { FamilyMember } from '../context/GameContext';
 import { useSound } from '../hooks/useSound';
 import { colors, gradients, fonts, radius, kawaiiButton, kawaiiCard } from '../styles/theme';
 
+// Get kawaii art from fal.ai cache
+function getCachedArt(letter: string): string | null {
+  try {
+    const cache = JSON.parse(localStorage.getItem('panda-keys-art-cache') || '{}');
+    return cache[letter] || cache[`${letter}-default`] || null;
+  } catch { return null; }
+}
+
+// Kawaii image component — shows generated art if available, falls back to emoji
+function KawaiiImg({ letter, fallback, size = 60, style }: { letter: string; fallback: string; size?: number; style?: React.CSSProperties }) {
+  const art = getCachedArt(letter);
+  if (art) {
+    return <img src={art} alt={fallback} style={{ width: size, height: size, objectFit: 'contain', borderRadius: '50%', ...style }} />;
+  }
+  return <span style={{ fontSize: size * 0.6, ...style }}>{fallback}</span>;
+}
+
 const KAWAII_COLORS = [
   { base: colors.pink, accent: colors.blush },
   { base: colors.sky, accent: `${colors.sky}40` },
@@ -25,19 +42,19 @@ const ROLE_EMOJIS: Record<string, string> = {
 
 const EYE_STYLES = ['round', 'sparkle', 'sleepy', 'happy'] as const;
 
-function FloatingPandas() {
-  const pandas = [
-    { top: '5%', left: '5%', delay: 0, size: '2.5rem' },
-    { top: '8%', right: '8%', delay: 0.5, size: '2rem' },
-    { top: '75%', left: '3%', delay: 1, size: '2.2rem' },
-    { top: '70%', right: '5%', delay: 1.5, size: '1.8rem' },
-    { top: '40%', left: '2%', delay: 0.8, size: '1.5rem' },
-    { top: '35%', right: '3%', delay: 1.2, size: '1.6rem' },
+function FloatingKawaii() {
+  const critters = [
+    { top: '5%', left: '5%', delay: 0, size: 50, letter: 'P' },
+    { top: '8%', right: '8%', delay: 0.5, size: 40, letter: 'B' },
+    { top: '75%', left: '3%', delay: 1, size: 45, letter: 'C' },
+    { top: '70%', right: '5%', delay: 1.5, size: 36, letter: 'D' },
+    { top: '40%', left: '2%', delay: 0.8, size: 32, letter: 'K' },
+    { top: '35%', right: '3%', delay: 1.2, size: 34, letter: 'H' },
   ];
 
   return (
     <>
-      {pandas.map((p, i) => (
+      {critters.map((p, i) => (
         <motion.div
           key={i}
           animate={{ y: [0, -15, 0], rotate: [-5, 5, -5] }}
@@ -47,12 +64,11 @@ function FloatingPandas() {
             top: p.top,
             left: p.left,
             right: (p as any).right,
-            fontSize: p.size,
             zIndex: 2,
             opacity: 0.7,
           }}
         >
-          🐼
+          <KawaiiImg letter={p.letter} fallback="🐼" size={p.size} />
         </motion.div>
       ))}
     </>
@@ -71,21 +87,20 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
       <motion.div
         animate={{ rotate: [-5, 5, -5], scale: [1, 1.1, 1], y: [0, -10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
-        style={{ fontSize: '5rem', marginBottom: '10px' }}
+        style={{ marginBottom: '10px' }}
       >
-        🐼
+        <KawaiiImg letter="P" fallback="🐼" size={100} />
       </motion.div>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
-        {['🐼', '🐼', '🐼'].map((p, i) => (
-          <motion.span
+        {['B', 'C', 'D'].map((letter, i) => (
+          <motion.div
             key={i}
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
-            style={{ fontSize: '2rem' }}
           >
-            {p}
-          </motion.span>
+            <KawaiiImg letter={letter} fallback="🐼" size={44} />
+          </motion.div>
         ))}
       </div>
 
@@ -149,9 +164,9 @@ function NameStep({ onNext }: { onNext: () => void }) {
       <motion.div
         animate={{ rotate: [-3, 3, -3] }}
         transition={{ duration: 2, repeat: Infinity }}
-        style={{ fontSize: '4rem', marginBottom: '8px' }}
+        style={{ marginBottom: '8px' }}
       >
-        🐼
+        <KawaiiImg letter="P" fallback="🐼" size={80} />
       </motion.div>
       <motion.div
         initial={{ scale: 0 }}
@@ -359,16 +374,15 @@ function FamilyStep() {
       exit={{ opacity: 0, y: -20 }}
       style={{ textAlign: 'center', maxWidth: '600px', width: '100%', padding: '0 16px' }}
     >
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', marginBottom: '12px' }}>
-        {['🐼', '🐼', '🐼', '🐼'].map((p, i) => (
-          <motion.span
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '12px', alignItems: 'flex-end' }}>
+        {['E', 'P', 'L', 'B'].map((letter, i) => (
+          <motion.div
             key={i}
             animate={{ y: [0, -8, 0], rotate: [-3, 3, -3] }}
             transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }}
-            style={{ fontSize: i === 0 || i === 1 ? '2.5rem' : '1.8rem' }}
           >
-            {p}
-          </motion.span>
+            <KawaiiImg letter={letter} fallback="🐼" size={i === 0 || i === 1 ? 50 : 38} />
+          </motion.div>
         ))}
       </div>
 
@@ -641,7 +655,7 @@ export default function SetupFlow() {
       padding: '20px',
       overflow: 'auto',
     }}>
-      <FloatingPandas />
+      <FloatingKawaii />
       <AnimatePresence mode="wait">
         {step === 0 && <WelcomeStep key="welcome" onNext={handleNext} />}
         {step === 1 && <NameStep key="name" onNext={handleNext} />}

@@ -1,6 +1,22 @@
 import { motion } from 'framer-motion';
 import { colors, gradients } from '../styles/theme';
 
+// Get kawaii art from fal.ai cache
+function getCachedArt(letter: string): string | null {
+  try {
+    const cache = JSON.parse(localStorage.getItem('panda-keys-art-cache') || '{}');
+    return cache[letter] || cache[`${letter}-default`] || null;
+  } catch { return null; }
+}
+
+function KawaiiPeek({ letter, size = 40 }: { letter: string; size?: number }) {
+  const art = getCachedArt(letter);
+  if (art) {
+    return <img src={art} alt="" style={{ width: size, height: size, objectFit: 'contain', borderRadius: '50%', filter: 'drop-shadow(0 2px 4px rgba(205,180,219,0.3))' }} />;
+  }
+  return <span style={{ fontSize: size * 0.6 }}>🐼</span>;
+}
+
 // Animated background garden scene — soft kawaii palette
 export default function Garden() {
   return (
@@ -124,7 +140,7 @@ export default function Garden() {
         opacity: 0.5,
       }} />
 
-      {/* Pandas peeking from behind the hill */}
+      {/* Kawaii critters peeking from behind the hill */}
       <motion.div
         animate={{ y: [0, -8, 0] }}
         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
@@ -132,11 +148,10 @@ export default function Garden() {
           position: 'absolute',
           bottom: '22%',
           left: '15%',
-          fontSize: '2rem',
           zIndex: 1,
         }}
       >
-        🐼
+        <KawaiiPeek letter="P" size={44} />
       </motion.div>
       <motion.div
         animate={{ y: [0, -6, 0], rotate: [-3, 3, -3] }}
@@ -145,11 +160,10 @@ export default function Garden() {
           position: 'absolute',
           bottom: '20%',
           right: '12%',
-          fontSize: '1.8rem',
           zIndex: 1,
         }}
       >
-        🐼
+        <KawaiiPeek letter="B" size={38} />
       </motion.div>
       <motion.div
         animate={{ y: [0, -5, 0] }}
@@ -158,11 +172,10 @@ export default function Garden() {
           position: 'absolute',
           bottom: '24%',
           left: '55%',
-          fontSize: '1.4rem',
           zIndex: 1,
         }}
       >
-        🐼
+        <KawaiiPeek letter="C" size={32} />
       </motion.div>
 
       {/* Bamboo stalks */}
