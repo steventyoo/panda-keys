@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { getAnimalForLetter } from '../data/animals';
 import { colors, fonts, radius } from '../styles/theme';
+import { getAnimalArt } from '../utils/animalArt';
 
 const KEYBOARD_ROWS = [
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -132,13 +133,16 @@ export default function Keyboard({ collectedAnimals, onKeyClick }: Props) {
                 </span>
 
                 {isCollected && animal && (
-                  <span style={{
-                    fontSize: 'min(2.5vw, 0.7rem)',
-                    lineHeight: 1,
-                    marginTop: '1px',
-                  }}>
-                    {animal.emoji}
-                  </span>
+                  <img
+                    src={getAnimalArt(letter)}
+                    alt={animal.name}
+                    style={{
+                      width: 'min(3.5vw, 16px)',
+                      height: 'min(3.5vw, 16px)',
+                      objectFit: 'contain',
+                      marginTop: '1px',
+                    }}
+                  />
                 )}
 
                 {isPressed && (

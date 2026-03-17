@@ -1,15 +1,7 @@
-import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { KawaiiAnimal } from '../data/animals';
 import { colors, fonts, radius } from '../styles/theme';
-
-function getGeneratedArt(letter: string): string | null {
-  try {
-    const cache = JSON.parse(localStorage.getItem('panda-keys-art-cache') || '{}');
-    // Cache keys may be "A" or "A-default" format
-    return cache[letter] || cache[`${letter}-default`] || null;
-  } catch { return null; }
-}
+import { getAnimalArt } from '../utils/animalArt';
 
 interface Props {
   animal: KawaiiAnimal;
@@ -91,11 +83,7 @@ const sizeMap = {
 export default function KawaiiAnimalDisplay({ animal, id, onComplete, size = 'medium', persistent = false }: Props) {
   const variant = entranceVariants[animal.entrance];
   const s = sizeMap[size];
-  const [generatedArt, setGeneratedArt] = useState<string | null>(null);
-
-  useEffect(() => {
-    setGeneratedArt(getGeneratedArt(animal.letter));
-  }, [animal.letter]);
+  const generatedArt = getAnimalArt(animal.letter);
 
   return (
     <AnimatePresence>
@@ -151,23 +139,17 @@ export default function KawaiiAnimalDisplay({ animal, id, onComplete, size = 'me
             ✨
           </motion.div>
 
-          {generatedArt ? (
-            <img
-              src={generatedArt}
-              alt={animal.name}
-              style={{
-                width: '85%',
-                height: '85%',
-                objectFit: 'contain',
-                mixBlendMode: 'multiply' as const,
-                filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))',
-              }}
-            />
-          ) : (
-            <span style={{ fontSize: s.emoji, lineHeight: 1 }}>
-              {animal.emoji}
-            </span>
-          )}
+          <img
+            src={generatedArt}
+            alt={animal.name}
+            style={{
+              width: '85%',
+              height: '85%',
+              objectFit: 'contain',
+              mixBlendMode: 'multiply' as const,
+              filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))',
+            }}
+          />
         </motion.div>
 
         {/* Name label */}

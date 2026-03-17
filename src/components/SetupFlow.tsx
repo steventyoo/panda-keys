@@ -5,22 +5,11 @@ import type { FamilyMember } from '../context/GameContext';
 import { useSound } from '../hooks/useSound';
 import { useFalAI } from '../hooks/useFalAI';
 import { colors, gradients, fonts, radius, kawaiiButton, kawaiiCard } from '../styles/theme';
+import { getAnimalArt } from '../utils/animalArt';
 
-// Get kawaii art from fal.ai cache
-function getCachedArt(letter: string): string | null {
-  try {
-    const cache = JSON.parse(localStorage.getItem('panda-keys-art-cache') || '{}');
-    return cache[letter] || cache[`${letter}-default`] || null;
-  } catch { return null; }
-}
-
-// Kawaii image component — shows generated art if available, falls back to emoji
-function KawaiiImg({ letter, fallback, size = 60, style }: { letter: string; fallback: string; size?: number; style?: React.CSSProperties }) {
-  const art = getCachedArt(letter);
-  if (art) {
-    return <img src={art} alt={fallback} style={{ width: size, height: size, objectFit: 'contain', borderRadius: '50%', mixBlendMode: 'multiply' as const, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))', ...style }} />;
-  }
-  return <span style={{ fontSize: size * 0.6, ...style }}>{fallback}</span>;
+// Kawaii image component — uses static assets
+function KawaiiImg({ letter, size = 60, style }: { letter: string; size?: number; style?: React.CSSProperties }) {
+  return <img src={getAnimalArt(letter)} alt={letter} style={{ width: size, height: size, objectFit: 'contain', borderRadius: '50%', mixBlendMode: 'multiply' as const, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))', ...style }} />;
 }
 
 const KAWAII_COLORS = [
@@ -65,7 +54,7 @@ function FloatingKawaii() {
             opacity: 0.7,
           }}
         >
-          <KawaiiImg letter={p.letter} fallback="🐼" size={p.size} />
+          <KawaiiImg letter={p.letter} size={p.size} />
         </motion.div>
       ))}
     </>
@@ -86,7 +75,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
         transition={{ duration: 2, repeat: Infinity }}
         style={{ marginBottom: '10px' }}
       >
-        <KawaiiImg letter="P" fallback="🐼" size={100} />
+        <KawaiiImg letter="P" size={100} />
       </motion.div>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
@@ -96,7 +85,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
           >
-            <KawaiiImg letter="P" fallback="🐼" size={44} />
+            <KawaiiImg letter="P" size={44} />
           </motion.div>
         ))}
       </div>
@@ -178,7 +167,7 @@ function NameStep({ onNext }: { onNext: () => void }) {
         transition={{ duration: 2, repeat: Infinity }}
         style={{ marginBottom: '8px' }}
       >
-        <KawaiiImg letter="P" fallback="🐼" size={80} />
+        <KawaiiImg letter="P" size={80} />
       </motion.div>
       <motion.div
         initial={{ scale: 0 }}
@@ -409,7 +398,7 @@ function FamilyStep() {
             animate={{ y: [0, -8, 0], rotate: [-3, 3, -3] }}
             transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }}
           >
-            <KawaiiImg letter="P" fallback="🐼" size={i === 0 || i === 1 ? 50 : 38} />
+            <KawaiiImg letter="P" size={i === 0 || i === 1 ? 50 : 38} />
           </motion.div>
         ))}
       </div>
