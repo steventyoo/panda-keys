@@ -1,0 +1,167 @@
+import { useState, useCallback } from 'react';
+
+// fal.ai integration for generating kawaii animal images
+// Uses the fal.ai REST API directly (no server needed for client-side usage)
+
+const FAL_API_URL = 'https://fal.run/fal-ai/flux/schnell';
+
+interface GeneratedImage {
+  url: string;
+  letter: string;
+  animalName: string;
+}
+
+// Cache generated images in localStorage
+function getCachedImage(letter: string): string | null {
+  try {
+    const cache = JSON.parse(localStorage.getItem('panda-keys-art-cache') || '{}');
+    return cache[letter] || null;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedImage(letter: string, url: string) {
+  try {
+    const cache = JSON.parse(localStorage.getItem('panda-keys-art-cache') || '{}');
+    cache[letter] = url;
+    localStorage.setItem('panda-keys-art-cache', JSON.stringify(cache));
+  } catch { /* ignore */ }
+}
+
+export function useFalAI() {
+  const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const generateKawaiiAnimal = useCallback(async (
+    animalName: string,
+    letter: string,
+    apiKey: string,
+    action?: string, // e.g., "roaring", "sleeping", "waving"
+  ): Promise<GeneratedImage | null> => {
+    // Check cache first
+    const cacheKey = `${letter}-${action || 'default'}`;
+    const cached = getCachedImage(cacheKey);
+    if (cached) {
+      return { url: cached, letter, animalName };
+    }
+
+    setGenerating(true);
+    setError(null);
+
+    const actionDesc = action ? `, ${action}` : '';
+    const prompt = `kawaii chibi ${animalName}${actionDesc}, cute round body, big sparkly eyes, pastel colors, simple flat design, white background, sticker style, adorable, no text, high quality illustration`;
+
+    try {
+      const response = await fetch(FAL_API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Key ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          image_size: 'square',
+          num_images: 1,
+          num_inference_steps: 4,
+          enable_safety_checker: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`fal.ai error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const imageUrl = data.images?.[0]?.url;
+
+      if (!imageUrl) {
+        throw new Error('No image returned');
+      }
+
+      // Cache the result
+      setCachedImage(cacheKey, imageUrl);
+      setGenerating(false);
+
+      return { url: imageUrl, letter, animalName };
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Generation failed');
+      setGenerating(false);
+      return null;
+    }
+  }, []);
+
+  const generateAllAnimals = useCallback(async (
+    animals: Array<{ name: string; letter: string }>,
+    apiKey: string,
+    onProgress?: (completed: number, total: number) => void,
+  ) => {
+    const results: GeneratedImage[] = [];
+    const total = animals.length;
+
+    for (let i = 0; i < animals.length; i++) {
+      const { name, letter } = animals[i];
+      const result = await generateKawaiiAnimal(name, letter, apiKey);
+      if (result) results.push(result);
+      onProgress?.(i + 1, total);
+      // Small delay to avoid rate limiting
+      if (i < animals.length - 1) {
+        await new Promise(r => setTimeout(r, 500));
+      }
+    }
+
+    return results;
+  }, [generateKawaiiAnimal]);
+
+  // Generate a kawaii version of an uploaded photo
+  const kawaiiifyPhoto = useCallback(async (
+    photoDataUrl: string,
+    apiKey: string,
+    description?: string, // e.g., "brown dog", "tabby cat"
+  ): Promise<string | null> => {
+    setGenerating(true);
+    setError(null);
+
+    const prompt = `kawaii chibi version of a ${description || 'person'}, cute round body, big sparkly eyes, pastel colors, simple flat design, white background, sticker style, adorable, no text`;
+
+    try {
+      // Use img2img endpoint for photo-based generation
+      const response = await fetch('https://fal.run/fal-ai/flux/dev/image-to-image', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Key ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          image_url: photoDataUrl,
+          strength: 0.75,
+          num_images: 1,
+          num_inference_steps: 20,
+          enable_safety_checker: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`fal.ai error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const imageUrl = data.images?.[0]?.url;
+      setGenerating(false);
+      return imageUrl || null;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Generation failed');
+      setGenerating(false);
+      return null;
+    }
+  }, []);
+
+  return {
+    generateKawaiiAnimal,
+    generateAllAnimals,
+    kawaiiifyPhoto,
+    generating,
+    error,
+  };
+}
